@@ -1,0 +1,4 @@
+<apex:page standardController="Account" showheader="false" sidebar="false">
+  <apex:iframe src="https://qliksense2.turtle.com:443/salesforce/single/?appid=cb87a01b-aab5-4189-9be5-22a22aa769f9&sheet=6e4a7fe5-9987-4b80-8ce8-eca460d15584&opt=ctxmenu,currsel&select=$::%25CustKey,{!Account.CustKey__c}&select=$::CalendarType,Fiscal" height="750px" width="100%" frameborder="0">
+  </apex:iframe>
+</apex:page>

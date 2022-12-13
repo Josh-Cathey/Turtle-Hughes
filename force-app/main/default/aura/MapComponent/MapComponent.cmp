@@ -1,0 +1,56 @@
+<!--
+ - Created by dimitrisavelieff on 2020-04-14.
+ -->
+
+<aura:component description="MapComponent" implements="force:hasSObjectName,force:hasRecordId,flexipage:availableForRecordHome">
+    <aura:handler name="init" value="{!this}" action="{! c.init }"/>
+
+    <aura:attribute name="sObjectName" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="zoomLevel" type="Integer" />
+
+    <aura:attribute name="street" type="String" />
+    <aura:attribute name="city" type="String" />
+    <aura:attribute name="state" type="String" />
+    <aura:attribute name="postalCode" type="String" />
+    <aura:attribute name="country" type="String" />
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="desc" type="String" />
+
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="fieldsList" type="String[]"/>
+    <aura:attribute name="recId" type="String"/>
+    <aura:attribute name="mapMarkers" type="Object"/>
+
+    <force:recordData aura:id="recordLoader"
+                      recordId="{!v.recId}"
+                      targetFields="{!v.record}"
+                      targetError="{!v.recordError}"
+                      fields="{!v.fieldsList}"
+                      recordUpdated="{!c.handleRecordUpdated}"
+    />
+
+    <!-- the map component -->
+    <aura:if isTrue="{!v.recordError}">
+        <div class="demo-only" style="height:4rem">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="status">
+                    <span class="slds-assistive-text">error</span>
+                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+        <lightning:icon iconName="utility:error" alternativeText="Error!" title="Error" variant="inverse" size="small"/>
+      </span>
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small ">
+                            {!v.recordError} Field names are case sensitive.</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.mapMarkers.length > 0}" >
+        <lightning:map
+                mapMarkers="{! v.mapMarkers }"
+                zoomLevel="{! v.zoomLevel }" />
+    </aura:if>
+</aura:component>

@@ -1,0 +1,7 @@
+<apex:page standardController="Account">
+            <p>{!Account.Account_Update__c}</p>
+            Last Update on: 
+            <apex:outputText value="{0, date, MMMM d','  yyyy}">
+    <apex:param value="{!Account.Latest_Account_Update__c}" /> 
+</apex:outputText>
+</apex:page>

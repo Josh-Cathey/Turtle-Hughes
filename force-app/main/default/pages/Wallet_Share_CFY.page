@@ -1,0 +1,6 @@
+<apex:page standardController="Account">
+            <p><apex:outputText value="{0, number}">Estimated Spent Potential: $<apex:param value="{!Account.Estimated_Spend_Potential__c}" /></apex:outputText></p>
+            <p><apex:outputText value="{0, number}">Current Fiscal Year Sales: $<apex:param value="{!Account.Current_Fiscal_Year_Sales__c}" /></apex:outputText></p>
+            <p>Wallet Share: {!Account.Current_Estimated_Share_of_Wallet__c }%&nbsp;&nbsp;&nbsp;
+            <apex:outputText value="{!Account.Wallet_Share_CFY__c}" escape="false" /></p>
+</apex:page>

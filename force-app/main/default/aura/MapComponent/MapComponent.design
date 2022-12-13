@@ -1,0 +1,15 @@
+<!--
+ - Created by dimitrisavelieff on 2020-04-14.
+ -->
+
+<design:component>
+    <design:attribute name="street" label="Street API Name" description="API Name of Street Field" />
+    <design:attribute name="city" label="City API Name" description="API Name of City Field" />
+    <design:attribute name="state" label="State API Name" description="API Name of State Field" />
+    <design:attribute name="postalCode" label="Postal Code API Name" description="API Name of Postal Code Field" />
+    <design:attribute name="country" label="Country API Name" description="API Name of Country Field" />
+<!--    <design:attribute name="geolocation" label="Geolocation API Name" description="API Name of Geolocation Field. If both Address and Geolocation are entered, map will use Geolocation data" />-->
+    <design:attribute name="title" label="Map Marker Title API Name" description="API name of field that contains the Title used in the map marker. If empty will default to Name field" />
+    <design:attribute name="desc" label="Map Marker Description API Name" description="API name of field that contains the description used in the map marker" />
+    <design:attribute name="zoomLevel" label="Zoom Level" description="Default Zoom Level 1-20 (1: World 5: Landmass/continent 10: City 15: Streets 20: Buildings)" />
+</design:component>
