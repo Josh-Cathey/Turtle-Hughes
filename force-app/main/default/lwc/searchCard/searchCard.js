@@ -1,4 +1,11 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
+
+// TESTING 
+//import { isGuest } from '@salesforce/user/isGuest';
+// import isGuestUser from '@salesforce/apex/B2BGetInfo.isGuestUser';
+import isGuest from '@salesforce/user/isGuest';
+import userId from '@salesforce/user/Id';
+import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
 
 /**
  * An organized display of a single product card.
@@ -7,6 +14,9 @@ import { LightningElement, api } from 'lwc';
  * @fires SearchCard#showdetail
  */
 export default class SearchCard extends LightningElement {
+    // TESTING
+    @track promptGuestToSignIn = false;
+    @track id;
     /**
      * An event fired when the user clicked on the action button. Here in this
      *  this is an add to cart button.
@@ -104,7 +114,7 @@ export default class SearchCard extends LightningElement {
      *  {@see LayoutConfig}
      *
      * @property {Boolean} actionDisabled
-     *  Whether or not to disable the action button.
+     *  Whether or not to disable the action button. We are currently setting this to false, for testing.
      */
 
     /**
@@ -178,7 +188,10 @@ export default class SearchCard extends LightningElement {
      * @private
      */
     get actionDisabled() {
-        return !!(this.config || {}).actionDisabled;
+        //return !!(this.config || {}).actionDisabled;
+        
+        // ONLY FOR TESTING - Returning false for now
+        return false;
     }
 
     /**
@@ -260,16 +273,25 @@ export default class SearchCard extends LightningElement {
      * @private
      */
     notifyAction() {
-        this.dispatchEvent(
-            new CustomEvent('calltoaction', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    productId: this.displayData.id,
-                    productName: this.displayData.name
-                }
-            })
-        );
+        console.log('isGuest == ' + isGuest);
+        if (!isGuest) {
+            this.dispatchEvent(
+                new CustomEvent('calltoaction', {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        productId: this.displayData.id,
+                        productName: this.displayData.name
+                    }
+                })
+            );
+        }
+        else {
+            this.promptGuestToSignIn = true;
+        }
+
+
+       
     }
 
     /**

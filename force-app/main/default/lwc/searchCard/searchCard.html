@@ -58,5 +58,24 @@
                 Add to Cart
             </button>
         </section>
+        <template if:true={promptGuestToSignIn}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <h1 class="slds-modal__title slds-hyphenate slds-align_absolute-center">Please log in or create an account to add items to your cart</h1>
+                    </div>
+                    <div class="slds-modal__footer slds-modal__footer_directional">
+                        <!-- FOR TESTING ONLY - THE HREF ATTRIBUTES BELOW NEED TO BE UPDATED WHEN MOVED TO PRODUCTION -->
+                        <a class="slds-button slds-button_neutral" href="https://turtlehughes--uat.sandbox.my.site.com/s/login" target="_blank">
+                            Log In
+                        </a>
+                        <a class="slds-button slds-button_brand" href="https://turtlehughes--uat.sandbox.my.site.com/s/login/SelfRegister" target="_blank">
+                            Create an Account
+                        </a>
+                    </div>
+                </div>
+            </section>
+                <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
     </article>
 </template>

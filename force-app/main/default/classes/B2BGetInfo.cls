@@ -140,4 +140,9 @@ public with sharing class B2BGetInfo {
       effectiveAccountId
     );
   }
+
+  @AuraEnabled
+  public static string isGuestUser(){
+    return UserInfo.getUserType();
+  }
 }

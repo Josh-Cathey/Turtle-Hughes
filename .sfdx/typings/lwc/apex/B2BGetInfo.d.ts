@@ -16,3 +16,6 @@ declare module "@salesforce/apex/B2BGetInfo.createAndAddToList" {
 declare module "@salesforce/apex/B2BGetInfo.getProductPrice" {
   export default function getProductPrice(param: {communityId: any, productId: any, effectiveAccountId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/B2BGetInfo.isGuestUser" {
+  export default function isGuestUser(): Promise<any>;
+}
