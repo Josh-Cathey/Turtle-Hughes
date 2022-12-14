@@ -23,6 +23,9 @@ export default class ProductDetails extends LightningElement {
      */
     @api
     get effectiveAccountId() {
+        if (this._effectiveAccountId === '000000000000000'){
+            this._effectiveAccountId = null;
+        }
         return this._effectiveAccountId;
     }
 
@@ -101,7 +104,9 @@ export default class ProductDetails extends LightningElement {
      * The connectedCallback() lifecycle hook fires when a component is inserted into the DOM.
      */
     connectedCallback() {
-        this.updateCartInformation();
+        if (!isGuest) {
+            this.updateCartInformation();
+        }
     }
 
     /**
@@ -115,10 +120,7 @@ export default class ProductDetails extends LightningElement {
         const effectiveAccountId = this.effectiveAccountId || '';
         let resolved = null;
 
-        if (
-            effectiveAccountId.length > 0 &&
-            effectiveAccountId !== '000000000000000'
-        ) {
+        if (effectiveAccountId.length > 0 && effectiveAccountId !== '000000000000000') {
             resolved = effectiveAccountId;
         }
         return resolved;
@@ -150,8 +152,9 @@ export default class ProductDetails extends LightningElement {
             ),
             description: this.product.data.fields.Description,
             image: {
-                alternativeText: this.product.data.defaultImage.alternativeText,
-                url: resolve(this.product.data.defaultImage.url)
+                // ONLY FOR TESTING, ONCE PRODUCTS HAVE THESE ATTRIBUTES WE CAN UNCOMMENT THIS. OTHERWISE THE COMPONENT FAILS TO COMPILE.
+                //alternativeText: this.product.data.defaultImage.alternativeText == null ? '' : this.product.data.defaultImage.alternativeText,
+                //url: resolve(this.product.data.defaultImage.url)
             },
             inStock: this.inStock.data === true,
             name: this.product.data.fields.Name,
