@@ -6,6 +6,7 @@ import communityId from '@salesforce/community/Id';
 import productSearch from '@salesforce/apex/B2BSearchController.productSearch';
 import getCartSummary from '@salesforce/apex/B2BGetInfo.getCartSummary';
 import addToCart from '@salesforce/apex/B2BGetInfo.addToCart';
+import isGuest from '@salesforce/user/isGuest';
 import { transformData } from './dataNormalizer';
 
 /**
@@ -414,18 +415,20 @@ export default class SearchResults extends NavigationMixin(LightningElement) {
      * Ensures cart information is up to date
      */
     updateCartInformation() {
-        getCartSummary({
-            communityId: communityId,
-            effectiveAccountId: this.resolvedEffectiveAccountId
-        })
-            .then((result) => {
-                this._cartSummary = result;
+        if (!isGuest) {
+            getCartSummary({
+                communityId: communityId,
+                effectiveAccountId: this.resolvedEffectiveAccountId
             })
-            .catch((e) => {
-                // Handle cart summary error properly
-                // For this sample, we can just log the error
-                console.log(e);
-            });
+                .then((result) => {
+                    this._cartSummary = result;
+                })
+                .catch((e) => {
+                    // Handle cart summary error properly
+                    // For this sample, we can just log the error
+                    console.log(e);
+                });
+        }
     }
 
     _displayData;
