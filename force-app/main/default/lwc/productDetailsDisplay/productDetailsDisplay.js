@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import isGuest from '@salesforce/user/isGuest';
 
 // A fixed entry for the home page.
 const homePage = {
@@ -16,9 +17,8 @@ const homePage = {
  * @fires ProductDetailsDisplay#addtocart
  * @fires ProductDetailsDisplay#createandaddtolist
  */
-export default class ProductDetailsDisplay extends NavigationMixin(
-    LightningElement
-) {
+export default class ProductDetailsDisplay extends NavigationMixin(LightningElement) {
+    @track promptGuestToSignIn = false;
     /**
      * An event fired when the user indicates the product should be added to their cart.
      *
@@ -237,14 +237,19 @@ export default class ProductDetailsDisplay extends NavigationMixin(
      * @private
      */
     notifyAddToCart() {
-        let quantity = this._quantityFieldValue;
-        this.dispatchEvent(
-            new CustomEvent('addtocart', {
-                detail: {
-                    quantity
-                }
-            })
-        );
+        if (!isGuest) {
+            let quantity = this._quantityFieldValue;
+            this.dispatchEvent(
+                new CustomEvent('addtocart', {
+                    detail: {
+                        quantity
+                    }
+                })
+            );
+        }
+        else {
+            this.promptGuestToSignIn = true;
+        }
     }
 
     /**

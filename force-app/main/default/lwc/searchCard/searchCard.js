@@ -1,10 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
-
-// TESTING 
-//import { isGuest } from '@salesforce/user/isGuest';
-// import isGuestUser from '@salesforce/apex/B2BGetInfo.isGuestUser';
 import isGuest from '@salesforce/user/isGuest';
-import userId from '@salesforce/user/Id';
 import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
 
 /**
@@ -273,7 +268,6 @@ export default class SearchCard extends LightningElement {
      * @private
      */
     notifyAction() {
-        console.log('isGuest == ' + isGuest);
         if (!isGuest) {
             this.dispatchEvent(
                 new CustomEvent('calltoaction', {
@@ -289,9 +283,6 @@ export default class SearchCard extends LightningElement {
         else {
             this.promptGuestToSignIn = true;
         }
-
-
-       
     }
 
     /**

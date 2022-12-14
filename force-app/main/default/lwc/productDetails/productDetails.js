@@ -7,6 +7,7 @@ import checkProductIsInStock from '@salesforce/apex/B2BGetInfo.checkProductIsInS
 import addToCart from '@salesforce/apex/B2BGetInfo.addToCart';
 import createAndAddToList from '@salesforce/apex/B2BGetInfo.createAndAddToList';
 import getProductPrice from '@salesforce/apex/B2BGetInfo.getProductPrice';
+import isGuest from '@salesforce/user/isGuest';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { resolve } from 'c/cmsResourceResolver';
 
@@ -276,10 +277,11 @@ export default class ProductDetails extends LightningElement {
      * Ensures cart information is up to date
      */
     updateCartInformation() {
-        getCartSummary({
-            communityId: communityId,
-            effectiveAccountId: this.resolvedEffectiveAccountId
-        })
+        if (!isGuest) {
+            getCartSummary({
+                communityId: communityId,
+                effectiveAccountId: this.resolvedEffectiveAccountId
+            })
             .then((result) => {
                 this.cartSummary = result;
             })
@@ -288,5 +290,6 @@ export default class ProductDetails extends LightningElement {
                 // For this sample, we can just log the error
                 console.log(e);
             });
+        }
     }
 }
