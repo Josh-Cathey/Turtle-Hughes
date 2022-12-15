@@ -336,4 +336,8 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             this.createAccountUrl = generatedUrl;
         });
     }
+
+    closeModal() {
+        this.promptGuestToSignIn = false;
+    }
 }

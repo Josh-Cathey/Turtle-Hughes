@@ -11,7 +11,6 @@ import { NavigationMixin } from 'lightning/navigation';
  * @fires SearchCard#showdetail
  */
 export default class SearchCard extends NavigationMixin(LightningElement) {
-    // TESTING
     @track promptGuestToSignIn = false;
     @track id;
     @track createAccountUrl;
@@ -324,6 +323,10 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         }).then((generatedUrl) => { 
             this.createAccountUrl = generatedUrl;
         });
+    }
+
+    closeModal() {
+        this.promptGuestToSignIn = false;
     }
 }
 
