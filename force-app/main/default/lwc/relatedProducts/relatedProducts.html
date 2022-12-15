@@ -1,0 +1,104 @@
+<template>
+    <template if:true={hasProducts}>
+   </template>
+    <template if:true={hasProducts}>
+      <div
+        class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small"
+      >
+     
+        <template for:each={CSModifiedProducts} for:item="Product">
+          <lightning-layout key={Product.id} multiple-rows>
+             
+            <lightning-layout-item padding="around-small" size="6">
+              <lightning-layout>
+                <lightning-layout-item padding="around-small" size="12">
+                  <figure class="slds-image slds-image--card">
+                      <img
+                        src={Product.defaultImage.url}
+                        style="max-width: 50%; max-height: 200px;"
+                        alt="Description of the image"
+                     />
+                  </figure>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small" size="12">
+                  <div class="page-section page-main slds-text-align_left">
+                 
+                    <h1 class="slds-text-heading_medium">
+                      <lightning-formatted-rich-text
+                      value={Product.fields.Name}></lightning-formatted-rich-text>
+                 
+                    </h1>
+                    <lightning-formatted-rich-text
+                      value={Product.fields.Description}></lightning-formatted-rich-text>
+                      
+                   
+                   
+    
+                    <br />
+                    <br />
+                    <!--
+                         <c-long-text-format value={Product.fields.Description}></c-long-text-format>
+                    <div
+                      class="quantity-selector slds-grid slds-grid_vertical-align-center slds-text-title_caps"
+                    >
+                     <label
+                        for="quantity-230"
+                        class="selector-label slds-m-right_x-small"
+                        >qty</label
+                      >
+                      <input
+                        aria-describedby="input-error-message-230"
+                        id={Product.id}
+                        onchange={handleQTYChange}
+                        max="100000"
+                        min="1"
+                        type="number"
+                        required=""
+                        class="selector-input slds-p-horizontal_medium slds-p-vertical_x-small"
+                      />
+    
+                      <lightning-button
+                        label="Add to Cart"
+                        id={Product.id}
+                        onclick={addProductToCart}
+                      >
+                      </lightning-button>
+                    </div>
+   -->
+   <!--
+   <a href={Product.fullUrl} class="slds-image__crop--4-by-3">
+    <img
+      src={Product.defaultImage.url}
+      style="max-width: 50%; max-height: 300px;"
+      alt="Description of the image"
+    />
+   </a>
+   -->
+                    <div onclick={handleClick} data-value={Product.id}>
+                      <button
+                        class="slds-button slds-button_brand"
+                        style="border-radius: 0px;"
+                      >
+                        More Information
+                      </button>
+                    </div>
+                  </div>
+                </lightning-layout-item>
+              </lightning-layout>
+            </lightning-layout-item>
+            <!--
+            <lightning-layout-item
+              flexibility="auto"
+              padding="around-small"
+              size="12"
+            >
+              <div class="page-footer page-section">
+                <h2>Footer</h2>
+              </div>
+            </lightning-layout-item>
+            -->
+          </lightning-layout>
+        </template>
+      </div>
+    </template>
+   </template>

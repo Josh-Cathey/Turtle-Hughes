@@ -1,0 +1,7 @@
+<design:component label="AdVic Community Footer">
+    <design:attribute name="footerId" label="Select Footer Record" datasource="apex://AdVic_FooterHelper"
+                      description="Select one of your created Community_Footer__c records to apply"/>
+    
+      
+    
+</design:component>

@@ -1,0 +1,7 @@
+.THIS .halfCard, .THIS.halfCard{
+    width: 49.5%;
+}
+.THIS button.slds-button.advBtn {
+    position: relative;
+    top: 15px;
+}

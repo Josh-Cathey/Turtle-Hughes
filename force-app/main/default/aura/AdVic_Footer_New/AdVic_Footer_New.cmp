@@ -1,0 +1,29 @@
+<aura:component implements="lightning:actionOverride,lightning:isUrlAddressable"
+                controller="AdVic_FooterHelper">
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.getRT}"/>
+	<aura:attribute name="fields" type="String[]" 
+                    default="['Name','CreatedByDate','Column_1__c','Column_2__c','Column_3__c','Column_4__c','Column_5__c',
+                                                           'Column_6__c','Final_Words__c']" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true"/>
+    <aura:attribute name="newRecRt" type="String"/>
+    
+    
+    <aura:if isTrue="{!v.showSpinner}"/>
+    
+    
+    <lightning:card title="{!'New Community Footer - '+v.newRecRt.Name}" class="slds-p-around_small" iconName="custom:custom19">
+        <lightning:recordForm objectApiName="Community_Footer__c"
+                              fields="{!v.fields}"
+                              columns="1"
+                              recordTypeId="{!v.newRecRt.Id}"
+                              onsuccess="{!c.handleSuccess}" />
+    </lightning:card>
+    
+    
+    
+    
+    
+    
+    
+</aura:component>

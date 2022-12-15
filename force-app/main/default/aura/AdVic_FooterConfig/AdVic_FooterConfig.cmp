@@ -1,0 +1,120 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="AdVic_FooterHelper" access="global" >
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <aura:attribute name="backgroundColor" type="String"/>
+    <aura:attribute name="doingGradient" type="Boolean" default="true"/>
+    <aura:attribute name="gradientColor" type="String"/>
+    <aura:attribute name="deg" type="Integer" default="45"/>
+    
+    <aura:attribute name="textColor" type="String"/>
+    <aura:attribute name="matchTextLinks" type="Boolean" default="true"/>
+    <aura:attribute name="linkColor" type="String"/>
+    
+    <aura:attribute name="Background_CSS__c" type="String"/>
+    <aura:attribute name="Link_Element_CSS_Color__c" type="String"/>
+    <aura:attribute name="Plaintext_CSS_Color__c" type="String"/>
+    
+    <aura:attribute name="refreshFlag" type="String" default=""/>
+    <aura:attribute name="showAdvanced" type="Boolean" default="false"/>
+    <aura:attribute name="col5" type="String" default=""/>
+    <aura:attribute name="col6" type="String" default=""/>
+    <aura:attribute name="rtName" type="String" default=""/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.getCurrentStyles}"/>
+    
+    <div>
+        <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="Community_Footer__c" onsuccess="{!c.handleSuccess}">
+            <lightning:messages/>
+            
+            <lightning:card title="Columns" class="slds-float_right halfCard slds-p-around_small">
+         
+                
+                <lightning:inputField fieldName="Name" />
+                <aura:if isTrue="{!v.rtName != 'Sitemap'}">
+                    <lightning:inputField fieldName="Column_1__c" />
+                    <lightning:inputField fieldName="Column_2__c"/>
+                    <lightning:inputField fieldName="Column_3__c"/>
+                    <lightning:inputField fieldName="Column_4__c"/>
+                    <lightning:inputField fieldName="Column_5__c" value="{!v.col5}"/>
+                    <aura:if isTrue="{!v.col5 != '' &amp;&amp; v.col6 == ''}">
+                        <span style="color:var(--lwc-colorTextError,rgb(194, 57, 52)); font-size:12px;">&nbsp;Note: 5 Columns is not suggested</span>
+                    </aura:if>
+                    <lightning:inputField fieldName="Column_6__c" value="{!v.col6}"/>
+                </aura:if>
+                <lightning:inputField fieldName="Final_Words__c"/>
+                
+                <aura:if isTrue="{!v.showAdvanced}">
+                    <lightning:button label="Hide Advanced" variant="bare" onclick="{!c.toggleAdvanced}"/><br/>
+                    <div class="hiddenFields" style="display:noneX;">
+                        <lightning:inputField fieldName="Background_CSS__c" value="{!v.Background_CSS__c}"/>
+                        <lightning:inputField fieldName="Link_Element_CSS_Color__c" value="{!v.Link_Element_CSS_Color__c}"/>
+                        <lightning:inputField fieldName="Plaintext_CSS_Color__c" value="{!v.Plaintext_CSS_Color__c}"/>
+                    </div>
+                    <aura:set attribute="else">
+                        <lightning:button label="Show Advanced" class="advBtn" variant="bare" onclick="{!c.toggleAdvanced}"/>
+                        <div class="hiddenFields" style="display:none;">
+                            <lightning:inputField fieldName="Background_CSS__c" value="{!v.Background_CSS__c}"/>
+                            <lightning:inputField fieldName="Link_Element_CSS_Color__c" value="{!v.Link_Element_CSS_Color__c}"/>
+                            <lightning:inputField fieldName="Plaintext_CSS_Color__c" value="{!v.Plaintext_CSS_Color__c}"/>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                
+                
+                
+                
+                
+                
+                <lightning:button class="slds-m-around_small slds-float_right" variant="brand" type="submit" name="update" label="Save" />
+            </lightning:card>
+            
+            <lightning:card title="Background Color" class="halfCard">
+                <p class="slds-p-horizontal_small">
+                    <lightning:input type="toggle" label="Use Gradient Accent?" name="input2" checked="{!v.doingGradient}" onchange="{!c.handleToggles}"/>
+                    <lightning:input label="Background Color" type="color" id="favcolor" name="favcolor" value="{!v.backgroundColor}" onchange="{!c.setAttributeFields}"/>
+                    <aura:if isTrue="{!v.doingGradient}">
+                        <lightning:input label="Gradient Color" type="color" id="favcolor" name="favcolor" value="{!v.gradientColor}" onchange="{!c.setAttributeFields}"/>
+                        <lightning:slider label="Angle" value="{!v.deg}" min="0" max="360" step="1" onchange="{!c.setAttributeFields}"/>
+                    </aura:if>
+                </p>
+            </lightning:card>
+            
+            <lightning:card title="Text Colors" class="halfCard">
+                <p class="slds-p-horizontal_small">
+                    <lightning:input type="toggle" label="Different Link and Plaintext Colors?" name="input2" checked="{!v.matchTextLinks}" onchange="{!c.handleToggles}"/>
+                    <lightning:input label="Text Color" type="color" id="favcolor" name="favcolor" value="{!v.textColor}" onchange="{!c.setAttributeFields}"/>
+                    <aura:if isTrue="{!v.matchTextLinks}">
+                        <lightning:input label="Link Color" type="color" id="favcolor" name="favcolor" value="{!v.linkColor}" onchange="{!c.setAttributeFields}"/>
+                    </aura:if>
+                </p>
+            </lightning:card>
+            
+            <lightning:card title="Style Preview" class="halfCard">
+                <div class="slds-p-horizontal_small" style="{!'background:linear-gradient('+v.deg+'deg, '+v.gradientColor+' 0%,'+v.backgroundColor+' 100%);'}">
+                    <br/><br/><br/><br/>
+                    <center style="{!'color:'+v.textColor+';'}">
+                        This is a text preview
+                    </center>
+                    <br/><br/>
+                    <aura:if isTrue="{!v.matchTextLinks}">
+                        <aura:set attribute="else">
+                            <center style="{!'color:'+v.textColor+';'}">
+                                This is a link preview
+                            </center>
+                        </aura:set>
+                        <center style="{!'color:'+v.linkColor+';'}">
+                            This is a link preview
+                        </center>
+                    </aura:if>
+                    <br/><br/><br/><br/>
+                </div>  
+            </lightning:card>
+        </lightning:recordEditForm>
+    </div>
+    
+    
+    <br/><hr/><br/>
+    <c:AdVic_CommunityFooter footerId="{!v.recordId}" refreshFlag="{!v.refreshFlag}"/>
+    
+</aura:component>

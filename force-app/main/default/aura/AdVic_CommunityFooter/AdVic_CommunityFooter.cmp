@@ -1,0 +1,139 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" 
+                extends="forceCommunity:navigationMenuBase"
+                controller="AdVic_FooterHelper" access="global">
+    <aura:attribute name="colCount" type="Integer" default="0"/>
+    <aura:attribute name="showSiteMap" type="Boolean" default="true"/>
+    <aura:attribute name="textColorCss" type="String"/>
+    <aura:attribute name="bgCss" type="String"/>
+    <aura:attribute name="colData" type="String[]"/>
+    <aura:attribute name="finalWords" type="String"/>
+    <aura:attribute name="footerId" type="String"/>
+    <aura:attribute name="refreshFlag" type="String" default=""/>
+    <aura:attribute name="rtName" type="String" default=""/>
+    <aura:attribute name="linkColor" type="String" default=""/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.refreshFlag}" action="{!c.init}"/>
+
+    <aura:if isTrue="{!v.rtName != 'Sitemap'}">
+            <div class="{!'advic-footer-container isPageWidthFixed-false themeBgImage '+v.rtName}" style="{!'color:'+v.textColorCss+'; background:'+v.bgCss+';
+                                                                              margin-left: -400px;
+                                                                              padding-left: 400px;
+                                                                              margin-right: -400px;
+                                                                              padding-right: 400px;'}">
+               
+                
+                <span class="footer-links-wrapper">
+                    <lightning:layout multipleRows="true">
+                        <aura:iteration items="{!v.colData}" var="col" indexVar="colNum">
+                            <aura:if isTrue="{!(colNum > v.colCount) == false}">
+                                <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="{!(12/v.colCount)}" padding="around-small">
+                                    <div class="custom-box">
+                                        <lightning:formattedRichText value="{!col}"/>
+                                    </div>
+                                </lightning:layoutItem>
+                            </aura:if>
+                        </aura:iteration>
+                    </lightning:layout>
+                </span>
+                <span class="slds-p-around_medium">
+                    <center>
+                    	<lightning:formattedRichText value="{!v.finalWords}"/>
+                    </center>
+                </span>
+            </div>
+            
+            
+    </aura:if>
+    
+    <aura:if isTrue="{!v.rtName == 'Sitemap'}">
+        <div class="{!'advic-footer-container isPageWidthFixed-false themeBgImage '+v.rtName}" style="{!'color:'+v.textColorCss+'; background:'+v.bgCss+';
+                                                                                                      margin-left: -400px;
+                                                                                                      padding-left: 400px;
+                                                                                                      margin-right: -400px;
+                                                                                                      padding-right: 400px;'}">
+            <br/>
+            
+            
+            <aura:if isTrue="{!!v.menuItems}">
+                <center>
+                    <br/><br/>
+                    <b>No menu items, or menu items cannot be previewed on this page.</b>
+                    <br/><br/>
+                </center>
+            </aura:if>
+            
+            
+            <ul onclick="{!c.onClick}">
+                <div class="slds-grid slds-xgutters slds-xwrap">
+                    <aura:iteration items="{!v.menuItems}" var="item" >
+                        
+                        <aura:if isTrue="{!item.subMenu}">
+                            <aura:if isTrue="{!item.subMenu.length >= 1}">
+                                <div class="slds-col">
+                                    <aura:if isTrue="{!item.subMenu.length >= 1}">
+                                        <li class="smallCaps">{!item.label}</li>
+                                    </aura:if>
+                                    <!--single item in list, display as link-->
+                                    <aura:iteration items="{!item.subMenu}" var="subItem">
+                                        <li><a style="{!'color:'+v.linkColor}" data-menu-item-id="{!subItem.id}" href="">{!subItem.label}</a></li>
+                                    </aura:iteration>
+                                    
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!item.subMenu.length != 0}">
+                                            <div class="slds-col">
+                                                <li>{!item.label}
+                                                    <ul>
+                                                        <aura:iteration items="{!item.subMenu}" var="subItem">
+                                                            <li><a style="{!'color:'+v.linkColor}" data-menu-item-id="{!subItem.id}" href="">{!subItem.label}</a></li>
+                                                        </aura:iteration>
+                                                    </ul>
+                                                </li>
+                                            </div>
+                                        </aura:if>
+                                    </aura:set>
+                                </div>
+                            </aura:if>
+                            <aura:set attribute="else">
+                                <div class="slds-col">
+                                    <aura:if isTrue="{!item.label != 'Home'}">
+                                        <!--home--><li><a style="{!'color:'+v.linkColor}" data-menu-item-id="{!item.id}" href="">{!item.label}</a></li>
+                                    </aura:if>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </aura:iteration>
+                    
+                    
+                    <!--<div class="slds-col">
+                                <li class="smallCaps">External Links</li>
+                                <ul>
+                                    <li><a target="_blank" href="#">Terms &amp; Conditions</a></li>
+                                    <li><a target="_blank" href="#">Privacy Policy</a></li>
+                                    <li><a target="_blank" href="#">Cookie Policy</a></li>
+                                </ul>
+                            </div>-->
+                </div>
+                
+            </ul> 
+            
+            
+            <aura:if isTrue="{!v.finalWords != '' &amp;&amp; v.finalWords != undefined}">
+                <br/><span class="slds-p-around_medium">
+                <center>
+                    <lightning:formattedRichText value="{!v.finalWords}"/>
+                </center>
+                </span><br/>
+            </aura:if>
+            
+            <br/>
+        </div>
+       
+    </aura:if>
+    
+    
+  
+    
+    
+</aura:component>

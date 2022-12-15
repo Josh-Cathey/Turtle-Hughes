@@ -329,4 +329,3 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         this.promptGuestToSignIn = false;
     }
 }
-
