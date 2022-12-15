@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="AdVic_ProgressIndicator" ref="AdVic_ProgressIndicator" label="Label">
+		This Aura component is being used to display a progress indicator to the user during the checkout flow. 
+	</aura:example>
+</aura:documentation>
