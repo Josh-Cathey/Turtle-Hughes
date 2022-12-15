@@ -1,6 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import isGuest from '@salesforce/user/isGuest';
+import communityBasePath from '@salesforce/community/basePath';
 
 // A fixed entry for the home page.
 const homePage = {
@@ -19,6 +20,7 @@ const homePage = {
  */
 export default class ProductDetailsDisplay extends NavigationMixin(LightningElement) {
     @track promptGuestToSignIn = false;
+    @track createAccountUrl;
     /**
      * An event fired when the user indicates the product should be added to their cart.
      *
@@ -313,5 +315,25 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             ...field,
             id: index
         }));
+    }
+
+    guestBrowsingLogin() {
+        this[NavigationMixin.Navigate]({
+            type: 'comm__loginPage',
+            attributes: {
+                actionName: 'login'
+            }
+        });
+    }
+    
+    guestBrowsingCreateAccount() {
+        this[NavigationMixin.GenerateUrl]({
+            type: "standard__webPage",
+            attributes: {
+                url: communityBasePath + "/login/SelfRegister"
+            },
+        }).then((generatedUrl) => { 
+            this.createAccountUrl = generatedUrl;
+        });
     }
 }

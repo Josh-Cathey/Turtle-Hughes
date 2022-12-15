@@ -1,6 +1,8 @@
 import { LightningElement, api, track } from 'lwc';
 import isGuest from '@salesforce/user/isGuest';
 import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
+import communityBasePath from '@salesforce/community/basePath';
+import { NavigationMixin } from 'lightning/navigation';
 
 /**
  * An organized display of a single product card.
@@ -8,10 +10,11 @@ import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
  * @fires SearchCard#calltoaction
  * @fires SearchCard#showdetail
  */
-export default class SearchCard extends LightningElement {
+export default class SearchCard extends NavigationMixin(LightningElement) {
     // TESTING
     @track promptGuestToSignIn = false;
     @track id;
+    @track createAccountUrl;
     /**
      * An event fired when the user clicked on the action button. Here in this
      *  this is an add to cart button.
@@ -302,4 +305,25 @@ export default class SearchCard extends LightningElement {
             })
         );
     }
+
+    guestBrowsingLogin() {
+        this[NavigationMixin.Navigate]({
+            type: 'comm__loginPage',
+            attributes: {
+                actionName: 'login'
+            }
+        });
+    }
+    
+    guestBrowsingCreateAccount() {
+        this[NavigationMixin.GenerateUrl]({
+            type: "standard__webPage",
+            attributes: {
+                url: communityBasePath + "/login/SelfRegister"
+            },
+        }).then((generatedUrl) => { 
+            this.createAccountUrl = generatedUrl;
+        });
+    }
 }
+
