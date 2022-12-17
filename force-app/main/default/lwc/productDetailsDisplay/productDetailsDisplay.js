@@ -2,6 +2,7 @@ import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import isGuest from '@salesforce/user/isGuest';
 import communityBasePath from '@salesforce/community/basePath';
+import createGuestCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
 
 // A fixed entry for the home page.
 const homePage = {
@@ -21,6 +22,7 @@ const homePage = {
 export default class ProductDetailsDisplay extends NavigationMixin(LightningElement) {
     @track promptGuestToSignIn = false;
     @track createAccountUrl;
+    @track checkoutAsGuest = false;
     /**
      * An event fired when the user indicates the product should be added to their cart.
      *
@@ -252,6 +254,11 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         else {
             this.promptGuestToSignIn = true;
         }
+
+        // Add logic here to check for a guestCart
+        // if a cart is found, check to see if the cart contains the same product
+        // if the same product is found -> increment the product quantity by 1
+        // if the same product is not found -> add the item to the cart
     }
 
     /**
@@ -339,5 +346,27 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
     closeModal() {
         this.promptGuestToSignIn = false;
+    }
+
+    continueAsGuest() {
+        // displaying an alert message for testing to notify any testers that this functionality is not ready
+        alert('Sorry, this feature is not available yet. Please try again later.');
+
+        // if (this.guestCart == null) // this would be pulled from localStorage in connected callback and set as a param in this LWC
+        this.checkoutAsGuest = true;
+
+        // Call apex to create a guest cart object
+        // createGuestCart({})
+        //     .then((data) => {
+        //         console.log(data);
+        //     })
+        //     .catch(error => { alert('Error creating guest cart -> ' + error); })
+
+        // Call apex to create a guest cart item
+
+        // Set the item to the cart -> make sure we're incrementing the total per item if user adds same item
+        // When return, set cart to local storage
+
+        // We will need to check local storage in connectCallback for a guest cart if there is not a cart, then we can create one
     }
 }

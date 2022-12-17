@@ -1,8 +1,125 @@
 <template>
-    <div class="parent-header-container">
+    <div class="parent-header-container1">
         <div class="child-header-container1">
             <div class="turtleHuges">
                 <img src={logo}>
+            </div>
+        </div>
+        <div class="child-header-container2">
+            <div class="centerDiv">
+                <div>
+                    <lightning-input
+                        name="enter-search"
+                        type="search"
+                        placeholder="Enter keyword or SKU number"
+                    ></lightning-input>
+                </div>
+            </div>
+        </div>
+        <div class="child-header-container3">
+            <!-- For showing guest User Info -->
+            <div if:true={isGuest} class="guestUser">
+                    <div class="buttonInnerClass">
+                        <button type="button" class="btnClass" onclick={loginLink}>LOGIN</button>
+                    </div>
+                    <div class="cart">
+                        <div class="notification">
+                            <span><lightning-icon icon-name="utility:cart" onclick={guestCart} alternative-text="Connected" title="Connected">
+                            </lightning-icon></span>
+                            <span class="badge">3</span>
+                            <!-- Modal starts here -->
+                            <div if:true={showGuestCart} class="modalView">
+                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                    <div class="slds-modal__container">
+                                        <!-- Modal/Popup Box LWC header here -->
+                                        <header class="slds-modal__header">
+                                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                                                <lightning-icon icon-name="utility:close"
+                                                    alternative-text="close"
+                                                    variant="inverse"
+                                                    size="small" ></lightning-icon>
+                                                <span class="slds-assistive-text">Close</span>
+                                            </button>
+                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Cart Items</h2>
+                                        </header>
+                                        <!-- Modal/Popup Box LWC body starts here -->
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            <p><b>Modals/Popup Box are used to display content in a layer above the app.
+                                            </b></p>
+                                            <p><b>This paradigm is used in cases such as the creation or editing of a record, as well as various types of messaging and wizards.
+                                            </b></p>
+                                        </div>
+                                        <!-- Modal/Popup Box LWC footer starts here -->
+                                        <footer class="slds-modal__footer">
+                                            <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                                            <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">OK</button>
+                                        </footer>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                
+            </div>
+
+            <!-- For showing Authenticated Users Info -->
+            <div if:false={isGuest} class="user">
+                <img src={profileImg} style="width:30px;height:30px">
+                <div class="userName">
+                    <p>{userFirstName}</p>
+                </div>
+                <div class="cart">
+                    <div  class="notification2">
+                        <span><lightning-icon icon-name="utility:cart" onclick={userCart} alternative-text="Connected" title="Connected">
+                        </lightning-icon></span>
+                        <span class="badge2">3</span>
+                    </div>
+                </div>
+            </div>
+           
+        </div>   
+    </div>
+    <div class="parent-header-container2">
+        <div class="navBar">
+            <span onclick={home} class="button1 home">Home</span>
+            <span onclick={home} class="button1">Industries Served</span>
+            <span onclick={home} class="button1">Integerated Supply</span>
+            <div class="shopping button1">
+                <span onclick={home} >Shopping</span>
+                <lightning-icon icon-name="utility:chevrondown" alternative-text="chevrondown" size="xx-small" title="chevrondown" class="icon"></lightning-icon>
+                    <div class="shoppingDropdown">
+                        <span>Electrical</span>
+                        <span>Industrial</span>
+                        <span>Residential</span>
+                        <span>Special Offers</span>
+                    </div>
+            </div>
+            <div class="turtleAndHugesProducts button1">
+                <span onclick={home}>Turtles and Hughes Products</span>
+                <lightning-icon icon-name="utility:chevrondown" alternative-text="chevrondown" size="xx-small" title="chevrondown" class="icon"></lightning-icon>
+                <div class="turtleAndHugesProductsDropdown">
+                        <span>All Turtle and Hughes Products</span>
+                        <span>Rockwell Automation</span>
+                        <span>Industrial Control</span>
+                        <span>Distribution Equipment & Accessories</span>
+                        <span>Wiring Devices</span>
+                        <span>Driving & Driving Fittings</span>
+                        <span>Lighting Fixtures</span>
+                        <span>Fittings & Connectors</span>
+                        <span>Electrical Boxes & Covers</span>
+                        <span>Enclosures,Cabinets,and Rocks</span>
+                        <span>Wiring Connectors</span>
+                        <span>Testing & Measuring</span>
+                        <span>Wire,Cord,& Cable</span>
+                </div>
+            </div>
+            <div class="company button1">
+                <span onclick={home}>Company</span>
+                <lightning-icon icon-name="utility:chevrondown" alternative-text="chevrondown" size="xx-small" title="chevrondown" class="icon"></lightning-icon>
+                <div class="companyDropdown">
+                    <span>About Us</span>
+                    <span>Contact Us</span>
+                </div>
             </div>
         </div>
     </div>
