@@ -104,6 +104,9 @@ export default class ProductDetails extends LightningElement {
      * The connectedCallback() lifecycle hook fires when a component is inserted into the DOM.
      */
     connectedCallback() {
+        console.log('productDetails.js: this.recordId = ' + this.recordId);
+        console.log('productDetails.js: this.product = ');
+        console.log(this.product);
         if (!isGuest) {
             this.updateCartInformation();
         }

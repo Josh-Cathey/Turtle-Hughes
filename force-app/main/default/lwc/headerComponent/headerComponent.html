@@ -10,18 +10,22 @@
                 <div>
                     <lightning-input
                         name="enter-search"
-                        type="search"
+                        type="text"
                         placeholder="Enter keyword or SKU number"
+                        class="searchBar"
+                        onchange={searchItem}
                     ></lightning-input>
+                </div>
+                <div class="searchButton">
+                    <lightning-button label="Search" variant="brand" onclick={searchProducts}>
+                    </lightning-button>
                 </div>
             </div>
         </div>
         <div class="child-header-container3">
             <!-- For showing guest User Info -->
             <div if:true={isGuest} class="guestUser">
-                    <div class="buttonInnerClass">
-                        <button type="button" class="btnClass" onclick={loginLink}>LOGIN</button>
-                    </div>
+                    <button type="button" class="btnClass" onclick={loginLink}>LOGIN</button>
                     <div class="cart">
                         <div class="notification">
                             <span><lightning-icon icon-name="utility:cart" onclick={guestCart} alternative-text="Connected" title="Connected">

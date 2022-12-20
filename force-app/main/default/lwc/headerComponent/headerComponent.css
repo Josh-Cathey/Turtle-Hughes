@@ -13,19 +13,25 @@
 }
 .centerDiv{
     align-items: center;
+    display: flex;
 }
 .child-header-container1{
 	width:17%;
 }
 .child-header-container2{
 	width:30%;
+  justify-content: center;
+  align-items: center;
 }
 .guestUser{
 	display: flex;
 	justify-content: center;
     align-items: center;
 }
-
+.searchButton{
+  margin-top: 20px;
+  margin-left: 5px;
+}
 .notification {
     color: white;
     text-decoration: none;
@@ -87,9 +93,13 @@
     padding-right: 21px;
     padding-left: 17px;
 }
+.searchBar{
+  color:black;
+  cursor:pointer;
+}
 .parent-header-container2{
 	display:flex;
-	margin-top:39px;
+	margin-top:60px;
 	padding:16px;
 	color:white;
 	background-color: black;
@@ -197,13 +207,11 @@
 .turtleAndHugesProducts:hover .turtleAndHugesProductsDropdown{
   display:block;
 }
-.buttonInnerClass{
-  padding: 3px;
-  border-radius: 8px;
-  background-color: skyblue;
-}
+
 .btnClass{
-  background-color: skyblue;
+  padding: 6px;
+  border-radius: 8px;
+  background-color: rgb(37,116,169);
 }
 .modalView{
 	color:black;

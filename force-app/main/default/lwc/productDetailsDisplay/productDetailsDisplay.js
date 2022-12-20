@@ -1,8 +1,13 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import isGuest from '@salesforce/user/isGuest';
 import communityBasePath from '@salesforce/community/basePath';
 import createGuestCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
+import addItemToGuestCart from '@salesforce/apex/AdVic_GuestCartController.addItemToGuestCart';
+
+// TESTING 
+import createCartWithItem from '@salesforce/apex/AdVic_GuestCartController.createCartWithItem';
+
 
 // A fixed entry for the home page.
 const homePage = {
@@ -23,6 +28,17 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     @track promptGuestToSignIn = false;
     @track createAccountUrl;
     @track checkoutAsGuest = false;
+    @track cart;
+    
+    /**
+     * Gets or sets the unique identifier of a product.
+     *
+     * @type {string}
+     */
+    @api
+    recordId;
+
+
     /**
      * An event fired when the user indicates the product should be added to their cart.
      *
@@ -184,6 +200,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     });
 
     connectedCallback() {
+        console.log('productDetailsDisplay.js: this.recordId = ' + this.recordId);
         this._resolveConnected();
     }
 
@@ -350,22 +367,46 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
     continueAsGuest() {
         // displaying an alert message for testing to notify any testers that this functionality is not ready
-        alert('Sorry, this feature is not available yet. Please try again later.');
+        //alert('Sorry, this feature is not available yet. Please try again later.');
 
         // if (this.guestCart == null) // this would be pulled from localStorage in connected callback and set as a param in this LWC
         this.checkoutAsGuest = true;
 
         // Call apex to create a guest cart object
-        // createGuestCart({})
+        createGuestCart({})
+            .then((data) => {
+                console.log(data);
+                this.cart = data;
+                
+                // Create the guest cart item
+                // Call apex to create a guest cart item
+                this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
+                addItemToGuestCart({cartId: this.cart.Id, productId: this.recordId})
+                .then((data) => {
+                    this.cart = data;
+                    console.log(data);
+                })
+                .catch(error => { console.error('Error creating guest cart item -> ' + error.body); })
+            })
+            .catch(error => { console.error('Error creating guest cart -> ' + error.body); })
+
+
+        // TESTING WITH THE BELOW -> THE ABOVE CODE RETURNS NO ACCESS RESTRICTIONS
+        //this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
+
+        // createCartWithItem({productId: this.recordId})
         //     .then((data) => {
         //         console.log(data);
+        //         this.cart = data;
         //     })
-        //     .catch(error => { alert('Error creating guest cart -> ' + error); })
+        //     .catch(error => { console.error('Error creating guest cart with item -> ' + error.body); })
 
-        // Call apex to create a guest cart item
+
+        this.promptGuestToSignIn = false;
+
 
         // Set the item to the cart -> make sure we're incrementing the total per item if user adds same item
-        // When return, set cart to local storage
+        // When returned, set cart to local storage
 
         // We will need to check local storage in connectCallback for a guest cart if there is not a cart, then we can create one
     }
