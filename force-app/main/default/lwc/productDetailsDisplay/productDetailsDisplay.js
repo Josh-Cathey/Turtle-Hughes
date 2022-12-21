@@ -2,11 +2,11 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import isGuest from '@salesforce/user/isGuest';
 import communityBasePath from '@salesforce/community/basePath';
-import createGuestCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
-import addItemToGuestCart from '@salesforce/apex/AdVic_GuestCartController.addItemToGuestCart';
+import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
+import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
 
 // TESTING 
-import createCartWithItem from '@salesforce/apex/AdVic_GuestCartController.createCartWithItem';
+//import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.createCartWithItem';
 
 
 // A fixed entry for the home page.
@@ -29,6 +29,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     @track createAccountUrl;
     @track checkoutAsGuest = false;
     @track cart;
+    @track cartItems = [];
     
     /**
      * Gets or sets the unique identifier of a product.
@@ -200,7 +201,17 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     });
 
     connectedCallback() {
-        console.log('productDetailsDisplay.js: this.recordId = ' + this.recordId);
+        console.log('(this.cart == null) = ' + (this.cart == null));
+        console.log('this.cart = ' + this.cart);
+        if (this.cart == null) {
+            this.getCartFromLocalStorage();
+            console.log('Inside connectedCallback');
+            console.log('this.cart = ');
+            console.log(this.cart);
+        }
+
+        // console.log('productDetailsDisplay.js: this.recordId = ' + this.recordId);
+        this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
         this._resolveConnected();
     }
 
@@ -268,14 +279,19 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                 })
             );
         }
-        else {
+        else if (isGuest && this.cart != null) {
+            // let quantity = this._quantityFieldValue;
+            // console.log('notifyAddToCart was called!! this.quantity = ' + quantity);
+
+            this.addItemToGuestCart();
+        }
+        else if (isGuest && this.cart == null) {
+            this.getCartFromLocalStorage();
+            // console.log('inside notifyAddToCart(): after calling for cart, this.cart = ' + JSON.parse(this.cart)); 
+            // console.log('pull directly from local storage');
+            // console.log(JSON.parse(localStorage.getItem('Cart')));
             this.promptGuestToSignIn = true;
         }
-
-        // Add logic here to check for a guestCart
-        // if a cart is found, check to see if the cart contains the same product
-        // if the same product is found -> increment the product quantity by 1
-        // if the same product is not found -> add the item to the cart
     }
 
     /**
@@ -371,43 +387,56 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
         // if (this.guestCart == null) // this would be pulled from localStorage in connected callback and set as a param in this LWC
         this.checkoutAsGuest = true;
-
-        // Call apex to create a guest cart object
-        createGuestCart({})
-            .then((data) => {
-                console.log(data);
-                this.cart = data;
-                
-                // Create the guest cart item
-                // Call apex to create a guest cart item
-                this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
-                addItemToGuestCart({cartId: this.cart.Id, productId: this.recordId})
-                .then((data) => {
-                    this.cart = data;
-                    console.log(data);
-                })
-                .catch(error => { console.error('Error creating guest cart item -> ' + error.body); })
-            })
-            .catch(error => { console.error('Error creating guest cart -> ' + error.body); })
-
-
-        // TESTING WITH THE BELOW -> THE ABOVE CODE RETURNS NO ACCESS RESTRICTIONS
-        //this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
-
-        // createCartWithItem({productId: this.recordId})
-        //     .then((data) => {
-        //         console.log(data);
-        //         this.cart = data;
-        //     })
-        //     .catch(error => { console.error('Error creating guest cart with item -> ' + error.body); })
-
-
         this.promptGuestToSignIn = false;
 
+        this.initGuestCart();
+    }
 
-        // Set the item to the cart -> make sure we're incrementing the total per item if user adds same item
-        // When returned, set cart to local storage
+    initGuestCart() {
+        createCart({})
+            .then((data) => {
+                // console.log('Cart without item');
+                // console.log(data);
+                this.cart = data;
+                
+                // console.log('Calling addItemToGuestCart()');
+                this.addItemToGuestCart();
+            })
+            .catch(error => { console.error('Error creating guest cart -> ' + error.body.message); })
+    }
 
-        // We will need to check local storage in connectCallback for a guest cart if there is not a cart, then we can create one
+    addItemToGuestCart() {
+        // Check if the same product is being added to the cart
+        if (this.cart.product__c == this.recordId) {
+            // we need to call code here to increment the quantity on the product
+        }
+        // console.log('Called addItemToGuestCart()');
+        // console.log('Quantity requested, this._quantityFieldValue = ' + this._quantityFieldValue);
+
+        // local storage is currently saving the Guest_Cart_Item__c, so when adding another product to the cart
+        // we are actually passing the Guest_Cart_Item__c Id, not the actual Guest_Cart__c Id
+        // Need to address this!
+        addProductToCart({cartId: this.cart.Id, productId: this.recordId, quantity: this._quantityFieldValue})
+            .then((data) => {
+                this.cart = data;
+                // console.log('Cart with item');
+                // console.log(data);
+
+                // TESTING -> save to local storage
+                this.setCartToLocalStorage();
+                //this.getCartFromLocalStorage();
+            })
+            .catch(error => { console.error('Error creating guest cart item -> ' + error.body.message); })
+    }
+
+    setCartToLocalStorage() {
+        localStorage.setItem('cart', JSON.stringify(this.cart));
+    }
+
+    getCartFromLocalStorage() {
+        // console.log('called getCartFromLocalStorage()');
+        console.log('Reading cart in local storage');
+        console.log(JSON.parse(localStorage.getItem('cart')));
+        this.cart = JSON.parse(localStorage.getItem('cart'));
     }
 }
