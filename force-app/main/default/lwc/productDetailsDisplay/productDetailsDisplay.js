@@ -28,8 +28,19 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     @track promptGuestToSignIn = false;
     @track createAccountUrl;
     @track checkoutAsGuest = false;
+
+
     @track cart;
-    @track cartItems = [];
+
+    /**
+     * 
+     *  this.cart = cartConfig => {
+                        cart: this.cart,
+                        products: [] // Add guest cart items to this array
+                    };
+     */
+
+
     
     /**
      * Gets or sets the unique identifier of a product.
