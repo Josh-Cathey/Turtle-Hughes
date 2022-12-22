@@ -436,8 +436,8 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     updateCart() {
         retrieveUpdatedGuestCart({cartId: this.cart.Id})
             .then((data) => {
-                console.log('Calling retrieveUpdatedGuestCart');
-                console.log(data);
+                // console.log('Calling retrieveUpdatedGuestCart');
+                // console.log(data);
                 this.cart = data;
             })
             .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })

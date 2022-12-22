@@ -22,8 +22,7 @@ public without sharing class AdVic_GuestCartController {
                 WHERE Id = :cartId];
     }
 
-    // we need to update the cart when adding products
-    // create a method that updates the following fields on a cart
+    // add logic that updates the following fields on a cart
     // Cart_Subtotal__c, TotalAmountAfterAllAdjustments__c, GrandTotalAmount__c, TotalAmount__c
     public static void updateGuestCartTotals(String guestCartId, Guest_Cart_Item__c cartItem) {
         Guest_Cart__c guestCart = [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
@@ -31,16 +30,16 @@ public without sharing class AdVic_GuestCartController {
                                     WHERE Id = :guestCartId];
 
         // guestCart.Cart_Subtotal__c += 0; // roll up summary field
-        guestCart.TotalAmount__c += guestCart.TotalAmount__c;
-        guestCart.GrandTotalAmount__c += guestCart.TotalAmount__c;
+        // guestCart.TotalAmount__c += guestCart.TotalAmount__c;
+        // guestCart.GrandTotalAmount__c += guestCart.TotalAmount__c;
         // guestCart.TotalAmountAfterAllAdjustments__c += (guestCart.TotalPriceAfterAllAdjustments__c); // currently throwing an error!!!
     }
 
     // We need to update all price fields on the Guest Cart Item so we can use it in the above function when updating totals
-    // you will need to get the price from the pricebook record
+    // need to figure out how to calculate all these fields, and how to get necessary data from Price Book Entry
     @AuraEnabled
     public static Guest_Cart_Item__c adjustProductQuantity(String guestCartItemId, Integer quantity) {
-        Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c 
+        Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c, TotalAmount__c, TotalPrice__c 
                                             FROM Guest_Cart_Item__c 
                                             WHERE Id = :guestCartItemId];
         updatedItem.Quantity__c += quantity;
@@ -62,7 +61,7 @@ public without sharing class AdVic_GuestCartController {
             Guest_Cart__c = cartId, 
             Name = 'SFDevJC', // Need to figure out our naming convention here
             Product__c = productId,
-            Quantity__c = quantity // Need to add logic to increment this value in another method
+            Quantity__c = quantity 
         );
 
         try {

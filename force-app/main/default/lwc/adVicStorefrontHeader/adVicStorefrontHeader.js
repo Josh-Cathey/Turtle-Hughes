@@ -16,8 +16,8 @@ import FirstNameFld from '@salesforce/schema/User.FirstName';
 import userEmailFld from '@salesforce/schema/User.Email';
 import userIsActiveFld from '@salesforce/schema/User.IsActive';
 import userAliasFld from '@salesforce/schema/User.Alias';
-import getGuestCartItems from '@salesforce/apex/AdVic_GuestCartController.retrieveGuestCartItems';
-
+import getGuestCartItems from '@salesforce/apex/AdVic_GuestCartController.retrieveGuestCartItems'; // ATTENTION DEVS: THERE IS NO FUNCTION CALLED getGuestCartItems ON THE ADVIC_GUESTCARTCONTROLLER
+                                                                                                    // RENAMING THIS FOR NOW
 export default class adVicStorefrontHeader extends NavigationMixin(LightningElement) {
 
     @track cart;
@@ -26,8 +26,7 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     nameByContentReferenceId = new Map();
     guestUser = isGuest;
     isLoading;
-    @track badgeNumber;
-    recordId = 'a3T7c000000UOIUEA4';
+    @track badgeNumber = 0 ;
     listOfGuestCartItems=[];
     
     
@@ -111,10 +110,11 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     }*/
     cart;
     connectedCallback() {
+        console.log('It is a guest'+this.guestUser);
         console.log('(this.cart == null) = ' + (this.cart == null));
         console.log('this.cart = ' + this.cart);
-        if (this.cart == null) {
-             this.cart = this.getCartFromLocalStorage();
+        this.cart = this.getCartFromLocalStorage();
+        if (this.cart != null) {
              console.log('Gcart',this.cart.Guest_Cart__c);
              getGuestCartItems({guestCartId:this.cart.Guest_Cart__c}).then(result=>{
                 console.log('result got>>'+JSON.stringify(result));
@@ -131,6 +131,8 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
             console.log('Inside connectedCallback');
             console.log('this.cart = ');
             console.log(this.cart);
+        }else{
+
         }
 
         // console.log('productDetailsDisplay.js: this.recordId = ' + this.recordId);

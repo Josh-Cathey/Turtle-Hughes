@@ -3,10 +3,10 @@
     display: grid;
 }
 
-.top-menu {
+.top-menu[c-adVicStorefrontHeader_adVicStorefrontHeader] {
     position: absolute;
-    top: 14px;
-    right: 80px;
+    top: 10px;
+    right: 117px;
     height: 48px;
     line-height: 26px;
     display: flex;
@@ -57,15 +57,18 @@
     padding-right: 9px;
 	cursor: pointer;
 }
-.cart-container.badge{
+ .badge{
     position: absolute;
-	top: 0px;
-    right: 4px;
-    padding: 0px 4px;
+    height: 1rem;
+    top: -2px;
+    right: 1px;
     border-radius: 50%;
     background: red;
+    text-align: center;
+    width: 1rem;
     color: white;
     font-size: 65%;
+    line-height: 1rem;
 }
 
 @media only screen and (min-width: 768px) {
