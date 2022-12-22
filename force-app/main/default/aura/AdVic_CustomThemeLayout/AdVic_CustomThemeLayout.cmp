@@ -1,0 +1,31 @@
+<aura:component implements="forceCommunity:themeLayout,forceCommunity:layout,forceCommunity:profileMenuInterface,forceCommunity:availableForAllPageTypes" access="global" description="Custom Theme Layout">
+    <aura:attribute name="themeHeader" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="themeFooter" type="Aura.Component[]"/>
+    <aura:attribute name="test" type="String" />
+    <aura:attribute name="themeHero" type="Aura.Component[]"/>
+    <aura:attribute name="profileMenu" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="search" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="navBar" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="templateHeader" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="templateFooter" type="Aura.Component[]" required="false"/>
+    <div class="custom-wrapper">
+        <div class="slds-grid slds-grid_vertical-align-center">
+            <div class="slds-col profileMenuRegion">
+                <c:adVicStorefrontHeader></c:adVicStorefrontHeader>
+            </div>
+        </div>
+        <div class="slds-grid slds-grid_vertical-align-center">
+            <div class="slds-col">
+                {!v.themeHeader}
+            </div>
+        </div>
+        <div class="content">
+            {!v.body}
+        </div>
+        <div class="slds-grid slds-grid_vertical-align-end">
+            <div class="slds-col">
+                {!v.themeFooter}
+            </div>
+        </div>
+    </div>
+</aura:component>
