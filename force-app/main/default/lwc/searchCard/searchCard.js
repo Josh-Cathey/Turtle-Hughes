@@ -3,6 +3,10 @@ import isGuest from '@salesforce/user/isGuest';
 import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
 import communityBasePath from '@salesforce/community/basePath';
 import { NavigationMixin } from 'lightning/navigation';
+import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
+import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
+import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
+import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
 
 /**
  * An organized display of a single product card.
@@ -14,6 +18,11 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
     @track promptGuestToSignIn = false;
     @track id;
     @track createAccountUrl;
+    @track checkoutAsGuest = false;
+    @track products = [];
+    @track cart;
+    @track cartConfig;
+
     /**
      * An event fired when the user clicked on the action button. Here in this
      *  this is an add to cart button.
@@ -263,6 +272,22 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
             : 'card-layout-list';
     }
 
+    connectedCallback() {
+        //console.log('productDetailsDisplay.js: this.displayData.id (Id of the product) = ' + this.displayData.id);
+        if (this.cartConfig == null && isGuest) {
+            this.getCartFromLocalStorage();
+            
+            // console.log('Inside ConnectedCallback(): cartConfig');
+            // console.log(JSON.parse(JSON.stringify(this.cartConfig)));
+
+            // console.log('Inside ConnectedCallback(): cart');
+            // console.log(JSON.parse(JSON.stringify(this.cart)));
+
+            // console.log('Inside ConnectedCallback(): products');
+            // console.log(JSON.parse(JSON.stringify(this.products)));
+        }
+    }
+
     /**
      * Emits a notification that the user wants to add the item to their cart.
      *
@@ -282,7 +307,15 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                 })
             );
         }
-        else {
+
+        // Because each product card has its own state, we need to fetch the cart every time
+        // a new product card "add to cart" button is clicked
+        this.getCartFromLocalStorage();
+        if (isGuest && this.cartConfig != null) {
+            this.addItemToGuestCart();
+        }
+        else if (isGuest && this.cartConfig == null) {
+            this.getCartFromLocalStorage();
             this.promptGuestToSignIn = true;
         }
     }
@@ -327,5 +360,85 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
 
     closeModal() {
         this.promptGuestToSignIn = false;
+    }
+
+    continueAsGuest() {
+        this.checkoutAsGuest = true;
+        this.promptGuestToSignIn = false;
+
+        this.initGuestCart();
+    }
+
+    initGuestCart() {
+        createCart({})
+            .then((data) => {
+                this.cart = data;
+                this.addItemToGuestCart();
+            })
+            .catch(error => { console.error('Error creating guest cart -> ' + error); })
+    }
+
+    addItemToGuestCart() {
+        var foundMatchingItem = false;
+        for (var i = 0; i < this.products.length; i++) {
+            if (this.products[i].Product__c === this.displayData.id) {
+                foundMatchingItem = true;
+
+                // if found, increment the quantity on the product
+                // update the guest cart item record in apex
+                // then return the item, and update the item in the array
+                // you can only add a single product from the PLP
+                adjustProductQuantity({guestCartItemId: this.products[i].Id, quantity: 1})
+                    .then((data) => {
+                        this.products[i] = data;
+                        this.updateCart();
+                        this.setCartToLocalStorage();
+                    })
+                    .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
+
+                // if a record is found, break out of the loop
+                break;
+            }
+        }
+
+        if (!foundMatchingItem) {
+            addProductToCart({cartId: this.cart.Id, productId: this.displayData.id, quantity: 1})
+                .then((data) => {
+                    this.products.push(data);
+                    this.updateCart();
+                    this.setCartToLocalStorage();
+                })
+                .catch(error => { console.error('Error creating guest cart item -> ' + error); })
+        }
+    }
+
+    updateCart() {
+        retrieveUpdatedGuestCart({cartId: this.cart.Id})
+            .then((data) => {
+                // console.log('Calling retrieveUpdatedGuestCart');
+                // console.log(data);
+                this.cart = data;
+            })
+            .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
+    }
+
+    setCartToLocalStorage() {
+        var cartDetail = {
+            cart: this.cart,
+            products: this.products
+        };
+
+        this.cartConfig = cartDetail;
+
+        localStorage.setItem('cart', JSON.stringify(cartDetail));
+    }
+
+    getCartFromLocalStorage() {
+        this.cartConfig = JSON.parse(localStorage.getItem('cart'));
+
+        if (this.cartConfig != null) {
+            this.products = this.cartConfig.products;
+            this.cart = this.cartConfig.cart;
+        }
     }
 }

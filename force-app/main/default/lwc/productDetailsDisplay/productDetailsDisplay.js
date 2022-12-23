@@ -202,7 +202,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
     connectedCallback() {
         console.log('productDetailsDisplay.js: this.recordId (Id of the product) = ' + this.recordId);
-        if (this.cartConfig == null) {
+        if (this.cartConfig == null && isGuest) {
             this.getCartFromLocalStorage();
             console.log('Inside ConnectedCallback(): cartConfig');
             console.log(JSON.parse(JSON.stringify(this.cartConfig)));
@@ -456,7 +456,9 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
     getCartFromLocalStorage() {
         this.cartConfig = JSON.parse(localStorage.getItem('cart'));
-        this.products = this.cartConfig.products;
-        this.cart = this.cartConfig.cart;
+        if (this.cartConfig != null) {
+            this.products = this.cartConfig.products;
+            this.cart = this.cartConfig.cart;
+        }
     }
 }
