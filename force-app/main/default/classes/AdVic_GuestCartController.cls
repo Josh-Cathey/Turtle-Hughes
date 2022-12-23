@@ -1,6 +1,6 @@
 public without sharing class AdVic_GuestCartController {
 
-    //     public AdVic_GuestCartController() {}
+    // public AdVic_GuestCartController() {}
 
     // Should we set proper getters and setters here instead of using the word retrieve?
     // Currently only using 'retrieve' because we don't have getters and setters. 
@@ -8,7 +8,6 @@ public without sharing class AdVic_GuestCartController {
 
     @AuraEnabled
     public static Guest_Cart_Item__c retrieveGuestCartItems(String guestCartId) {
-
         return [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c 
                 FROM Guest_Cart_Item__c 
                 WHERE Guest_Cart__c = :guestCartId];
@@ -16,7 +15,6 @@ public without sharing class AdVic_GuestCartController {
 
     @AuraEnabled
     public static Guest_Cart__c retrieveUpdatedGuestCart(String cartId) {
-
         return [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
                 FROM Guest_Cart__c 
                 WHERE Id = :cartId];
@@ -24,16 +22,16 @@ public without sharing class AdVic_GuestCartController {
 
     // add logic that updates the following fields on a cart
     // Cart_Subtotal__c, TotalAmountAfterAllAdjustments__c, GrandTotalAmount__c, TotalAmount__c
-    public static void updateGuestCartTotals(String guestCartId, Guest_Cart_Item__c cartItem) {
-        Guest_Cart__c guestCart = [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
-                                    FROM Guest_Cart__c 
-                                    WHERE Id = :guestCartId];
+    // public static void updateGuestCartTotals(String guestCartId, Guest_Cart_Item__c cartItem) {
+    //     Guest_Cart__c guestCart = [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
+    //                                 FROM Guest_Cart__c 
+    //                                 WHERE Id = :guestCartId];
 
         // guestCart.Cart_Subtotal__c += 0; // roll up summary field
         // guestCart.TotalAmount__c += guestCart.TotalAmount__c;
         // guestCart.GrandTotalAmount__c += guestCart.TotalAmount__c;
         // guestCart.TotalAmountAfterAllAdjustments__c += (guestCart.TotalPriceAfterAllAdjustments__c); // currently throwing an error!!!
-    }
+    // }
 
     // We need to update all price fields on the Guest Cart Item so we can use it in the above function when updating totals
     // need to figure out how to calculate all these fields, and how to get necessary data from Price Book Entry
