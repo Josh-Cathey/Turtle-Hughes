@@ -7,6 +7,7 @@ import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
 import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
 import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
 import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 /**
  * An organized display of a single product card.
@@ -393,6 +394,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                         this.products[i] = data;
                         this.updateCart();
                         this.setCartToLocalStorage();
+
+                        // Display a popup so the user knows the product has been added to their cart
+                        this.showAddToCartNotification();
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -407,6 +411,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                     this.products.push(data);
                     this.updateCart();
                     this.setCartToLocalStorage();
+
+                    // Display a popup so the user knows the product has been added to their cart
+                    this.showAddToCartNotification();
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
         }
@@ -440,5 +447,14 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
             this.products = this.cartConfig.products;
             this.cart = this.cartConfig.cart;
         }
+    }
+
+    showAddToCartNotification() {
+        const evt = new ShowToastEvent({
+            title: 'Success',
+            message: 'Your cart has been updated.',
+            variant: 'success',
+        });
+        this.dispatchEvent(evt);
     }
 }

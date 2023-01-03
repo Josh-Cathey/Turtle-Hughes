@@ -5,10 +5,12 @@ import communityBasePath from '@salesforce/community/basePath';
 import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
 import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
 import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
-import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.getGuestCartItems';
+import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import { publish, MessageContext } from 'lightning/messageService';
 import SAMPLEMC from "@salesforce/messageChannel/MyMessageChannel__c";
+
 // A fixed entry for the home page.
 const homePage = {
     name: 'Home',
@@ -420,6 +422,9 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                         console.log(' check 4 ');
                         this.setCartToLocalStorage();
                         // window.location.reload();
+
+                        // Display a popup so the user knows the product has been added to their cart
+                        this.showAddToCartNotification();
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -438,6 +443,8 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                     // window.location.reload();
                     publish(this.messageContext, SAMPLEMC, undefined);       
 
+                    // Display a popup so the user knows the product has been added to their cart
+                    this.showAddToCartNotification();
 
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
@@ -473,5 +480,14 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             this.products = this.cartConfig.products;
             this.cart = this.cartConfig.cart;
         }
+    }
+
+    showAddToCartNotification() {
+        const evt = new ShowToastEvent({
+            title: 'Success',
+            message: 'Your cart has been updated.',
+            variant: 'success',
+        });
+        this.dispatchEvent(evt);
     }
 }
