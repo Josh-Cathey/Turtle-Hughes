@@ -3,10 +3,10 @@
     display: grid;
 }
 
-.top-menu[c-adVicStorefrontHeader_adVicStorefrontHeader] {
+.top-menu {
     position: absolute;
-    top: 10px;
-    right: 117px;
+    top: 0;
+    right: 80px;
     height: 48px;
     line-height: 26px;
     display: flex;
@@ -46,6 +46,7 @@
 .cart-icon:hover{
     --sds-c-icon-color-foreground-default: grey;
 }
+
 
 .cart-container{
     color: white;

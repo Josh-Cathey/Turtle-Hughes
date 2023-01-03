@@ -5,9 +5,10 @@ import communityBasePath from '@salesforce/community/basePath';
 import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
 import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
 import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
-import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
+import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.getGuestCartItems';
 
-
+import { publish, MessageContext } from 'lightning/messageService';
+import SAMPLEMC from "@salesforce/messageChannel/MyMessageChannel__c";
 // A fixed entry for the home page.
 const homePage = {
     name: 'Home',
@@ -205,13 +206,13 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         if (this.cartConfig == null && isGuest) {
             this.getCartFromLocalStorage();
             console.log('Inside ConnectedCallback(): cartConfig');
-            console.log(JSON.parse(JSON.stringify(this.cartConfig)));
+            //console.log(JSON.parse(JSON.stringify(this.cartConfig)));
 
-            console.log('Inside ConnectedCallback(): cart');
-            console.log(JSON.parse(JSON.stringify(this.cart)));
+            //console.log('Inside ConnectedCallback(): cart');
+            //console.log(JSON.parse(JSON.stringify(this.cart)));
 
-            console.log('Inside ConnectedCallback(): products');
-            console.log(JSON.parse(JSON.stringify(this.products)));
+          //  console.log('Inside ConnectedCallback(): products');
+           // console.log(JSON.parse(JSON.stringify(this.products)));
         }
 
 
@@ -286,9 +287,11 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             );
         }
         else if (isGuest && this.cartConfig != null) {
+            console.log('check 1');
             this.addItemToGuestCart();
         }
         else if (isGuest && this.cartConfig == null) {
+            console.log('check 2');
             this.getCartFromLocalStorage();
             this.promptGuestToSignIn = true;
         }
@@ -398,6 +401,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     }
 
     addItemToGuestCart() {
+        console.log(' check 3 ');
         var foundMatchingItem = false;
         for (var i = 0; i < this.products.length; i++) {
             if (this.products[i].Product__c === this.recordId) {
@@ -413,7 +417,9 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                     .then((data) => {
                         this.products[i] = data;
                         this.updateCart();
+                        console.log(' check 4 ');
                         this.setCartToLocalStorage();
+                        // window.location.reload();
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -428,16 +434,23 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                     this.products.push(data);
                     this.updateCart();
                     this.setCartToLocalStorage();
+                    //   eval("$A.get('e.force:refreshView').fire();");
+                    // window.location.reload();
+                    publish(this.messageContext, SAMPLEMC, undefined);       
+
+
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
         }
     }
+    @wire(MessageContext)
+    messageContext;
 
     updateCart() {
         retrieveUpdatedGuestCart({cartId: this.cart.Id})
             .then((data) => {
-                // console.log('Calling retrieveUpdatedGuestCart');
-                // console.log(data);
+                 console.log('Calling retrieveUpdatedGuestCart');
+                 console.log('test 01.1 = ',data);
                 this.cart = data;
             })
             .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })

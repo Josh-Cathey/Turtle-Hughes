@@ -16,9 +16,32 @@ import FirstNameFld from '@salesforce/schema/User.FirstName';
 import userEmailFld from '@salesforce/schema/User.Email';
 import userIsActiveFld from '@salesforce/schema/User.IsActive';
 import userAliasFld from '@salesforce/schema/User.Alias';
-import getGuestCartItems from '@salesforce/apex/AdVic_GuestCartController.retrieveGuestCartItems'; // ATTENTION DEVS: THERE IS NO FUNCTION CALLED getGuestCartItems ON THE ADVIC_GUESTCARTCONTROLLER
-                                                                                                    // RENAMING THIS FOR NOW
+import getGuestCartItems from '@salesforce/apex/AdVic_GuestCartController.getGuestCartItems';
+import {
+    subscribe,
+    unsubscribe,
+    APPLICATION_SCOPE,
+    MessageContext
+} from 'lightning/messageService';
+import SAMPLEMC from "@salesforce/messageChannel/MyMessageChannel__c";
+
 export default class adVicStorefrontHeader extends NavigationMixin(LightningElement) {
+
+    subscribeToMessageChannel() {
+        if (!this.subscription) {
+            this.subscription = subscribe(
+                this.messageContext,
+                SAMPLEMC,
+                (message) => this.connectedCallback(),
+                { scope: APPLICATION_SCOPE }
+            );
+        }
+    }
+
+    
+    @wire(MessageContext)
+    messageContext;
+
 
     @track cart;
     cmsContentContainer = {};
@@ -110,19 +133,25 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     }*/
     cart;
     connectedCallback() {
+        this.subscribeToMessageChannel();
+
         console.log('It is a guest'+this.guestUser);
         console.log('(this.cart == null) = ' + (this.cart == null));
         console.log('this.cart = ' + this.cart);
         this.cart = this.getCartFromLocalStorage();
         if (this.cart != null) {
-             console.log('Gcart',this.cart.Guest_Cart__c);
-             getGuestCartItems({guestCartId:this.cart.Guest_Cart__c}).then(result=>{
+            var newVar = JSON.parse(JSON.stringify(this.cart));
+            console.log('Gcart 0.1 == ',newVar.cart.Id);
+             console.log('Gcart == ',JSON.parse(JSON.stringify(this.cart)));
+             console.log('Gcart 1 == ',this.cart);
+             getGuestCartItems({guestCartId:newVar.cart.Id}).then(result=>{
                 console.log('result got>>'+JSON.stringify(result));
                 this.listOfGuestCartItems = result;
                 if(this.listOfGuestCartItems.length == 0){
                     this.badgeNumber = 0;
                 }else{
                     this.badgeNumber = this.listOfGuestCartItems.length;
+                   
                 }
                 console.log(this.badgeNumber);
             }).catch(error=>{
@@ -152,8 +181,13 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     }
     guestCart()
     {
-        console.log('cart',JSON.stringify(this.cart.Guest_Cart__c));
-        return window.open('/s/guest-cart/'+this.cart.Guest_Cart__c+'/'+this.cart.Name,'_self');
+          this.cart=this.getCartFromLocalStorage();
+        var newVar = JSON.parse(JSON.stringify(this.cart));
+      
+        console.log('cart',this.cart,'newVar',newVar);
+    //    window.location.replace('https://turtlehughes--uat.sandbox.my.site.com/s/guest-cart/a3T7c000000Ua4UEAS/sfdevjc');
+        // return window.location.href('https://turtlehughes--uat.sandbox.my.site.com/s/guest-cart/a3T7c000000Ua4UEAS/sfdevjc');
+    return window.open('https://turtlehughes--uat.sandbox.my.site.com/s/guest-cart/'+newVar.cart.Id+'/'+newVar.cart.Name,'_self');
     }
     
 }

@@ -2,15 +2,11 @@ public without sharing class AdVic_GuestCartController {
 
     // public AdVic_GuestCartController() {}
 
-    // Should we set proper getters and setters here instead of using the word retrieve?
-    // Currently only using 'retrieve' because we don't have getters and setters. 
-    // The headerComponent LWC was failing when calling a get method because there is not a getter defined. 
-
+    // Changes Made By daniel
     @AuraEnabled
-    public static Guest_Cart_Item__c retrieveGuestCartItems(String guestCartId) {
-        return [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c 
-                FROM Guest_Cart_Item__c 
-                WHERE Guest_Cart__c = :guestCartId];
+    public static List<Guest_Cart_Item__c> getGuestCartItems(String guestCartId){
+        List<Guest_Cart_Item__c> listOfItem = [SELECT Quantity__c, Guest_Cart__c, Id FROM Guest_Cart_Item__c where Guest_Cart__c = :guestCartId ];
+        return listOfItem;
     }
 
     @AuraEnabled
@@ -40,7 +36,7 @@ public without sharing class AdVic_GuestCartController {
         Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c, TotalAmount__c, TotalPrice__c 
                                             FROM Guest_Cart_Item__c 
                                             WHERE Id = :guestCartItemId];
-        updatedItem.Quantity__c += quantity;
+        updatedItem.Quantity__c += decimal.valueof(quantity);
 
         try {
             update updatedItem;

@@ -1,5 +1,5 @@
-declare module "@salesforce/apex/AdVic_GuestCartController.retrieveGuestCartItems" {
-  export default function retrieveGuestCartItems(param: {guestCartId: any}): Promise<any>;
+declare module "@salesforce/apex/AdVic_GuestCartController.getGuestCartItems" {
+  export default function getGuestCartItems(param: {guestCartId: any}): Promise<any>;
 }
 declare module "@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart" {
   export default function retrieveUpdatedGuestCart(param: {cartId: any}): Promise<any>;

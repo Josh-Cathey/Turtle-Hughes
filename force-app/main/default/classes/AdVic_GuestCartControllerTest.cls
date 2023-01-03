@@ -33,7 +33,7 @@ public class AdVic_GuestCartControllerTest {
     // }
 
     @isTest
-    static void testRetrieveGuestCartItems() {
+    static void testGetGuestCartItems() {
         Product2 testProduct = new Product2(IsActive = true, Name = 'TEST_PRODUCT');
         insert testProduct;
 
@@ -44,8 +44,8 @@ public class AdVic_GuestCartControllerTest {
         insert testItem;
 
         
-        Guest_Cart_Item__c updatedCartItem = AdVic_GuestCartController.retrieveGuestCartItems(testCart.Id);
-        System.assertNotEquals(null, updatedCartItem);
+        List<Guest_Cart_Item__c> updatedCartItem = AdVic_GuestCartController.getGuestCartItems(testCart.Id);
+        System.assertNotEquals(null, updatedCartItem[0].Id);
     }
 
     @isTest
@@ -104,4 +104,3 @@ public class AdVic_GuestCartControllerTest {
         System.assertNotEquals(null, updatedCart);
     }
 }
-        
