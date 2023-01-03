@@ -1,0 +1,19 @@
+<template>
+    <div class="header-container">
+        <div class="top-menu">
+            <div class="top-right">
+                <!-- Optional User Greeting
+                <div if:false={guestUser}>
+                    <span>{welcomeGreeting}</span> <span class="greeting-highlight">{userFirstName}</span> <span>!</span>
+                </div> -->
+                <div if:true={guestUser}>
+                    <div class="cart-container">
+                        <!-- Insert Custom  Cart Button Here  add cart-icon class-->
+                        <span><lightning-icon class="cart-icon" icon-name="utility:cart" size="small" alternative-text="Connected" title="Connected" onclick={guestCart}></lightning-icon></span>
+                        <span class="badge">{badgeNumber}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

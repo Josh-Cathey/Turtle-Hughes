@@ -1,3 +1,221 @@
-.dummy{
-	color : black;
+.parent-header-container1{
+	background-color: black;
+	align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+	padding: 20px;
+	display: flex;
+	color:white;
+}
+.centerDiv{
+    align-items: center;
+    display: flex;
+}
+.child-header-container1{
+	width:17%;
+}
+.child-header-container2{
+	width:30%;
+  justify-content: center;
+  align-items: center;
+}
+.guestUser{
+	display: flex;
+	justify-content: center;
+    align-items: center;
+}
+.searchButton{
+  margin-top: 20px;
+  margin-left: 5px;
+}
+.notification {
+    color: white;
+    text-decoration: none;
+    padding: 2px 9px;
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+    padding-right: 9px;
+	cursor:pointer;
+  }
+  
+  .notification .badge {
+    position: absolute;
+	top: 0px;
+    right: 4px;
+    padding: 0px 4px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 65%;
+  }
+  
+.notification2 {
+    color: white;
+    text-decoration: none;
+    padding: 2px 9px;
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+    padding-right: 9px;
+	cursor: pointer;
+  }
+  
+  .notification2 .badge2 {
+    position: absolute;
+	top: 0px;
+    right: 4px;
+    padding: 0px 4px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 65%;
+  }
+  .red-cart {
+      color: #DF0000; background:white;
+  }
+  .child-header-container3{
+	display: flex;
+}
+.user{
+	padding-top: 20px;
+    padding-right: 21px;
+	display:flex;
+	justify-content: center;
+    align-items: center;
+}
+.userName{
+	padding-top: 5px;
+    padding-right: 21px;
+    padding-left: 17px;
+}
+.searchBar{
+  color:black;
+  cursor:pointer;
+}
+.parent-header-container2{
+	display:flex;
+	margin-top:60px;
+	padding:16px;
+	color:white;
+	background-color: black;
+	position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+.navBar{
+	padding-left:25px;
+	font-size:12px;
+	display: flex;
+}
+.button1{
+	padding-right:25px;
+	text-align: center;
+}
+.button1:hover{
+	background-color: gainsboro;
+	cursor: pointer;
+}
+.home{
+	border-bottom: 2px solid skyblue;
+    padding-bottom: 13px;
+}
+
+.icon{
+	padding-top: 2px;
+    padding-left: 5px;
+	--sds-c-icon-color-foreground-default:white;
+}
+.shoppingDropdown {
+  display: none;
+  position: absolute;
+  background-color: black;
+  min-width: 165px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 14px;
+}
+
+.shoppingDropdown span {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+.shoppingDropdown span:hover {
+  background-color: #ddd;
+}
+
+.companyDropdown {
+  display: none;
+  position: absolute;
+  background-color: black;
+  min-width: 165px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 14px;
+}
+
+.companyDropdown span {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+.companyDropdown span:hover {
+  background-color: #ddd;
+}
+.turtleAndHugesProductsDropdown {
+  display: none;
+  position: absolute;
+  background-color: black;
+  min-width: 165px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 14px;
+  overflow-y:scroll;
+  height: 233px;
+}
+
+.turtleAndHugesProductsDropdown span {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+.turtleAndHugesProductsDropdown span:hover {
+  background-color: #ddd;
+}
+
+.shopping:hover .shoppingDropdown {
+  display: block;
+}
+.company:hover .companyDropdown{
+  display:block;
+}
+.turtleAndHugesProducts:hover .turtleAndHugesProductsDropdown{
+  display:block;
+}
+
+.btnClass{
+  padding: 6px;
+  border-radius: 8px;
+  background-color: rgb(37,116,169);
+}
+.modalView{
+	color:black;
+}
+.searchBox{
+  width:80%;
 }

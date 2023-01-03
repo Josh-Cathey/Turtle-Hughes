@@ -1,7 +1,15 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import isGuest from '@salesforce/user/isGuest';
 import communityBasePath from '@salesforce/community/basePath';
+import createCart from '@salesforce/apex/AdVic_GuestCartController.createCart';
+import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProductToCart';
+import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
+import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+import { publish, MessageContext } from 'lightning/messageService';
+import SAMPLEMC from "@salesforce/messageChannel/MyMessageChannel__c";
 
 // A fixed entry for the home page.
 const homePage = {
@@ -21,6 +29,20 @@ const homePage = {
 export default class ProductDetailsDisplay extends NavigationMixin(LightningElement) {
     @track promptGuestToSignIn = false;
     @track createAccountUrl;
+    @track checkoutAsGuest = false;
+    @track products = [];
+    @track cart;
+    @track cartConfig;
+    
+    /**
+     * Gets or sets the unique identifier of a product.
+     *
+     * @type {string}
+     */
+    @api
+    recordId;
+
+
     /**
      * An event fired when the user indicates the product should be added to their cart.
      *
@@ -182,6 +204,23 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     });
 
     connectedCallback() {
+        console.log('productDetailsDisplay.js: this.recordId (Id of the product) = ' + this.recordId);
+        if (this.cartConfig == null && isGuest) {
+            this.getCartFromLocalStorage();
+            console.log('Inside ConnectedCallback(): cartConfig');
+            //console.log(JSON.parse(JSON.stringify(this.cartConfig)));
+
+            //console.log('Inside ConnectedCallback(): cart');
+            //console.log(JSON.parse(JSON.stringify(this.cart)));
+
+          //  console.log('Inside ConnectedCallback(): products');
+           // console.log(JSON.parse(JSON.stringify(this.products)));
+        }
+
+
+
+
+        //this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
         this._resolveConnected();
     }
 
@@ -249,7 +288,13 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                 })
             );
         }
-        else {
+        else if (isGuest && this.cartConfig != null) {
+            console.log('check 1');
+            this.addItemToGuestCart();
+        }
+        else if (isGuest && this.cartConfig == null) {
+            console.log('check 2');
+            this.getCartFromLocalStorage();
             this.promptGuestToSignIn = true;
         }
     }
@@ -339,5 +384,110 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
 
     closeModal() {
         this.promptGuestToSignIn = false;
+    }
+
+    continueAsGuest() {
+        this.checkoutAsGuest = true;
+        this.promptGuestToSignIn = false;
+
+        this.initGuestCart();
+    }
+
+    initGuestCart() {
+        createCart({})
+            .then((data) => {
+                this.cart = data;
+                this.addItemToGuestCart();
+            })
+            .catch(error => { console.error('Error creating guest cart -> ' + error); })
+    }
+
+    addItemToGuestCart() {
+        console.log(' check 3 ');
+        var foundMatchingItem = false;
+        for (var i = 0; i < this.products.length; i++) {
+            if (this.products[i].Product__c === this.recordId) {
+                foundMatchingItem = true;
+
+                // TESTING
+                console.log('Attempting to add ' + this._quantityFieldValue + ' to productId ' + this.products[i].Product__c);
+
+                // if found, increment the quantity on the product
+                // update the guest cart item record in apex
+                // then return the item, and update the item in the array
+                adjustProductQuantity({guestCartItemId: this.products[i].Id, quantity: this._quantityFieldValue})
+                    .then((data) => {
+                        this.products[i] = data;
+                        this.updateCart();
+                        console.log(' check 4 ');
+                        this.setCartToLocalStorage();
+                        // window.location.reload();
+
+                        // Display a popup so the user knows the product has been added to their cart
+                        this.showAddToCartNotification();
+                    })
+                    .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
+
+                // if a record is found, break out of the loop
+                break;
+            }
+        }
+
+        if (!foundMatchingItem) {
+            addProductToCart({cartId: this.cart.Id, productId: this.recordId, quantity: this._quantityFieldValue})
+                .then((data) => {
+                    this.products.push(data);
+                    this.updateCart();
+                    this.setCartToLocalStorage();
+                    //   eval("$A.get('e.force:refreshView').fire();");
+                    // window.location.reload();
+                    publish(this.messageContext, SAMPLEMC, undefined);       
+
+                    // Display a popup so the user knows the product has been added to their cart
+                    this.showAddToCartNotification();
+
+                })
+                .catch(error => { console.error('Error creating guest cart item -> ' + error); })
+        }
+    }
+    @wire(MessageContext)
+    messageContext;
+
+    updateCart() {
+        retrieveUpdatedGuestCart({cartId: this.cart.Id})
+            .then((data) => {
+                 console.log('Calling retrieveUpdatedGuestCart');
+                 console.log('test 01.1 = ',data);
+                this.cart = data;
+            })
+            .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
+    }
+
+    setCartToLocalStorage() {
+        var cartDetail = {
+            cart: this.cart,
+            products: this.products
+        };
+
+        this.cartConfig = cartDetail;
+
+        localStorage.setItem('cart', JSON.stringify(cartDetail));
+    }
+
+    getCartFromLocalStorage() {
+        this.cartConfig = JSON.parse(localStorage.getItem('cart'));
+        if (this.cartConfig != null) {
+            this.products = this.cartConfig.products;
+            this.cart = this.cartConfig.cart;
+        }
+    }
+
+    showAddToCartNotification() {
+        const evt = new ShowToastEvent({
+            title: 'Success',
+            message: 'Your cart has been updated.',
+            variant: 'success',
+        });
+        this.dispatchEvent(evt);
     }
 }

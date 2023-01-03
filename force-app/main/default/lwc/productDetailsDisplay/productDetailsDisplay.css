@@ -4,6 +4,14 @@
     align-items: stretch;
 }
 
+.addToCartAlert {
+    text-align: center;
+}
+
+.alertButton {
+    margin-top: 10px;
+}
+
 lightning-breadcrumbs {
     display: block;
 }
