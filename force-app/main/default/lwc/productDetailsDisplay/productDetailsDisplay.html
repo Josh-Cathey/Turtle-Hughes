@@ -70,23 +70,58 @@
                         </lightning-formatted-number>
                     </b>
                 </div>
-                <div class="slds-p-vertical_small container">
+
+
+                <div class="slds-p-around_medium lgc-bg">
+                    <lightning-layout>
+                        <lightning-layout-item>
+                            <label class="slds-m-right_x-small">QTY</label>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <lightning-button-icon icon-name="utility:add"  alternative-text="increment" title="increment" variant='brand'></lightning-button-icon>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <lightning-input type="number" value="1" variant="label-hidden"></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <lightning-button-icon icon-name="utility:dash"  alternative-text="decrement" title="decrement" variant='brand'></lightning-button-icon>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-button
+                                label="Add to Cart"
+                                variant="brand"
+                                class="slds-m-left_x-small"
+                                disabled={_isAddToCartDisabled}
+                                onclick={notifyAddToCart}
+                            >
+                            </lightning-button>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-button
+                                label="Add to List"
+                                variant="brand"
+                                class="slds-m-left_x-small"
+                                onclick={notifyCreateAndAddToList}
+                            >
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+
+                <!-- <div class="container" style="display: block; width: min-content;">
                     <span class="slds-m-bottom_small">
                         <span class="quantity-selector slds-grid slds-grid_vertical-align-center">
                             <label class="slds-m-right_x-small">QTY</label>
                             <span class="controls slds-m-right_small">
-                                <button class="decrement-btn slds-p-horizontal_xx-small slds-p-vertical_x-small">
-                                    <lightning-icon 
-                                        class="btn-icon slds-icon-utility-dash slds-icon_container"
-                                        title="Decrease the number of items"
-                                    >
-                                    </lightning-icon>
+                                <lightning-button-icon icon-name="utility:add"  alternative-text="increment" title="increment" variant='brand'></lightning-button-icon>
                                 </button>
                                 <lightning-input
                                     class="selector-input"
                                     type="number"
                                     name="quantity"
-                                    label="QTY"
+                                    label=""
                                     value="1"
                                     min="1"
                                     max="9999"
@@ -104,7 +139,7 @@
                                 </button>
                             </span>
                         </span>
-                    </span>
+                    </span> -->
 
 
                     <!-- <lightning-layout vertical-align="end">
@@ -141,9 +176,9 @@
                             >
                             </lightning-button>
                         </lightning-layout-item>
-                    </lightning-layout> -->
+                    </lightning-layout>
                 </div>
-            </div>
+            </div> -->
             <!-- <lightning-accordion
                 active-section-name="description"
                 allow-multiple-sections-open
@@ -187,6 +222,6 @@
                 </section>
                     <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
             </template>
-        </div>
+        <!-- </div> -->
     </div>
 </template>

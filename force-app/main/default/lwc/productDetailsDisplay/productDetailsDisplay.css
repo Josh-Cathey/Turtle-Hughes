@@ -48,6 +48,12 @@ img {
     align-self: end;
 }
 
+.decrement-btn {
+    background: none;
+    border: none;
+    border-right: var(--lwc-borderWidthThin, 1px) solid var(--lwc-colorBorder, var(--dxp-g-neutral-1));
+}
+
 /* CSS Styling for narrow screens (e.g. phones) */
 @media only screen and (max-width: 48em) {
     /* SLDS token: mqSmall */
