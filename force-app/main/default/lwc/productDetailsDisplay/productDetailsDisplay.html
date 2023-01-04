@@ -70,8 +70,44 @@
                         </lightning-formatted-number>
                     </b>
                 </div>
-                <div class="slds-p-vertical_small">
-                    <lightning-layout vertical-align="end">
+                <div class="slds-p-vertical_small container">
+                    <span class="slds-m-bottom_small">
+                        <span class="quantity-selector slds-grid slds-grid_vertical-align-center">
+                            <label class="slds-m-right_x-small">QTY</label>
+                            <span class="controls slds-m-right_small">
+                                <button class="decrement-btn slds-p-horizontal_xx-small slds-p-vertical_x-small">
+                                    <lightning-icon 
+                                        class="btn-icon slds-icon-utility-dash slds-icon_container"
+                                        title="Decrease the number of items"
+                                    >
+                                    </lightning-icon>
+                                </button>
+                                <lightning-input
+                                    class="selector-input"
+                                    type="number"
+                                    name="quantity"
+                                    label="QTY"
+                                    value="1"
+                                    min="1"
+                                    max="9999"
+                                    step="1"
+                                    message-when-step-mismatch="Enter a whole number."
+                                    oncommit={handleQuantityChange}
+                                >
+                                </lightning-input>
+                                <button class="increment-btn slds-p-horizontal_xx-small slds-p-vertical_x-small">
+                                    <lightning-icon 
+                                        class="btn-icon slds-icon-utility-add slds-icon_container"
+                                        title="Increase the number of items"
+                                    >
+                                    </lightning-icon>
+                                </button>
+                            </span>
+                        </span>
+                    </span>
+
+
+                    <!-- <lightning-layout vertical-align="end">
                         <lightning-layout-item size="2">
                             <lightning-input
                                 type="number"
@@ -105,7 +141,7 @@
                             >
                             </lightning-button>
                         </lightning-layout-item>
-                    </lightning-layout>
+                    </lightning-layout> -->
                 </div>
             </div>
             <!-- <lightning-accordion
