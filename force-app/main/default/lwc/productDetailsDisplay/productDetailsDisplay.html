@@ -56,54 +56,59 @@
                     <span class="slds-p-horizontal_small">Out of stock</span>
                 </div>
             </div>
-            <div class="price">
-                <span if:false={hasPrice}>Price Unavailable</span>
-                <lightning-formatted-number
-                    if:true={hasPrice}
-                    currency-code={price.currency}
-                    format-style="currency"
-                    value={price.negotiated}
-                >
-                </lightning-formatted-number>
+            <div>
+                <div class="price">
+                    <span if:false={hasPrice}>Price Unavailable</span>
+                    <b>
+                        <lightning-formatted-number
+                            if:true={hasPrice}
+                            currency-code={price.currency}
+                            format-style="currency"
+                            class="slds-text-heading_small"
+                            value={price.negotiated}
+                        >
+                        </lightning-formatted-number>
+                    </b>
+                </div>
+                <div class="slds-p-vertical_small">
+                    <lightning-layout vertical-align="end">
+                        <lightning-layout-item size="2">
+                            <lightning-input
+                                type="number"
+                                name="quantity"
+                                label="QTY"
+                                value="1"
+                                min="1"
+                                max="9999"
+                                step="1"
+                                message-when-step-mismatch="Enter a whole number."
+                                oncommit={handleQuantityChange}
+                            >
+                            </lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-button
+                                label="Add to Cart"
+                                variant="brand"
+                                class="slds-m-left_x-small"
+                                disabled={_isAddToCartDisabled}
+                                onclick={notifyAddToCart}
+                            >
+                            </lightning-button>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-button
+                                label="Add to List"
+                                variant="brand"
+                                class="slds-m-left_x-small"
+                                onclick={notifyCreateAndAddToList}
+                            >
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
             </div>
-            <div class="slds-p-vertical_small">
-                <lightning-layout vertical-align="end">
-                    <lightning-layout-item size="2">
-                        <lightning-input
-                            type="number"
-                            name="quantity"
-                            label="qty"
-                            value="1"
-                            min="1"
-                            max="9999"
-                            step="1"
-                            message-when-step-mismatch="Enter a whole number."
-                            oncommit={handleQuantityChange}
-                        >
-                        </lightning-input>
-                    </lightning-layout-item>
-                    <lightning-layout-item>
-                        <lightning-button
-                            label="Add to Cart"
-                            variant="brand"
-                            class="slds-m-left_x-small"
-                            disabled={_isAddToCartDisabled}
-                            onclick={notifyAddToCart}
-                        >
-                        </lightning-button>
-                    </lightning-layout-item>
-                    <lightning-layout-item>
-                        <lightning-button
-                            label="Add to List"
-                            variant="brand"
-                            class="slds-m-left_x-small"
-                            onclick={notifyCreateAndAddToList}
-                        >
-                        </lightning-button>
-                    </lightning-layout-item>
-                </lightning-layout>
-            </div>
-            <lightning-accordion
+            <!-- <lightning-accordion
                 active-section-name="description"
                 allow-multiple-sections-open
             >
@@ -115,7 +120,7 @@
                         value={description}
                     ></lightning-formatted-rich-text>
                 </lightning-accordion-section>
-            </lightning-accordion>
+            </lightning-accordion> -->
             <template if:true={promptGuestToSignIn}>
                 <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
                     <div class="slds-modal__container">
