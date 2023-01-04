@@ -1,14 +1,18 @@
 <template>
-    <lightning-breadcrumbs class="slds-p-bottom_medium">
-        <template for:each={_resolvedCategoryPath} for:item="level">
-            <lightning-breadcrumb
-                key={level.name}
-                label={level.name}
-                href={level.url}
-            >
-            </lightning-breadcrumb>
-        </template>
-    </lightning-breadcrumbs>
+    <nav role="navigation" aria-label="Breadcrumbs">
+        <ol class="slds-breadcrumb slds-list_horizontal slds-wrap slds-p-bottom_medium">
+            <template for:each={_resolvedCategoryPath} for:item="level">
+                <li key={level.name} class="slds-breadcrumb__item">
+                    <a href={level.url}>
+                        <lightning-formatted-rich-text
+                            value={level.name}
+                        >
+                        </lightning-formatted-rich-text>
+                    </a>
+                </li>
+            </template>
+        </ol>
+    </nav>
     <div class="product-information">
         <div class="image slds-m-right_small">
             <figure
@@ -19,7 +23,9 @@
         </div>
         <div class="details-area">
             <div class="heading">
-                <h2 class="slds-text-heading_medium">{name}</h2>
+                <h2 class="slds-text-heading_medium">
+                    <lightning-formatted-rich-text value={name}></lightning-formatted-rich-text>
+                </h2>
                 <div class="slds-p-top_x-small">SKU: {sku}</div>
                 <div class="slds-p-bottom_medium">
                     <template for:each={_displayableFields} for:item="field">

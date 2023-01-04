@@ -319,6 +319,8 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         const path = [homePage].concat(
             newPath.map((level) => ({
                 name: level.name,
+                //name: this.escapeHtml(level.name),
+                //name: level.name.text(),
                 type: 'standard__recordPage',
                 attributes: {
                     actionName: 'view',
@@ -489,5 +491,19 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             variant: 'success',
         });
         this.dispatchEvent(evt);
+    }
+
+    escapeHtml(text) {
+        var map = {
+            '&amp;': '&#38;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        console.log('text = ' + text);
+        console.log('escapeHtml text = ' + text.replace(/[&<>"']/g, function(m) { return map[m]; }));
+        
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 }
