@@ -1,0 +1,76 @@
+<template >
+    <template if:true={information.productsOnly}>
+
+    <p class="slds-text-heading_small slds-p-top_small">If your cart requires a full truckload shipment (Shipment Mode FTL) or small package shipment (Shipment Mode Small Package), once you proceed to checkout, you will have the option to submit a freight request to Ecore Customer Service or arrange your own freight.  Once freight is added to your order, you will receive notification to complete the checkout process.  Freight should be added to your order within 2 to 4 hours.
+    </p>
+
+    <lightning-layout multiple-rows>
+        <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6" padding="around-small" >
+            <div class="custom-box slds-align_absolute-center">
+                <div class="content">
+                <p class="slds-text-heading_medium slds-align_absolute-center" title="LicenseType">Total Weight</p>
+                
+                <p>
+                    <lightning-formatted-number
+                    value={information.overallWeight}
+                    class="slds-text-heading_medium slds-align_absolute-center"
+                ></lightning-formatted-number>
+            </p>
+
+            </div>
+            </div>
+            
+           
+            
+        </lightning-layout-item>
+       
+        <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6" padding="around-small" >
+            <div class="custom-box slds-align_absolute-center">
+                <div class="content">
+                <p class="slds-text-heading_medium slds-align_absolute-center" title="LicenseType">Shipment Mode</p>
+                
+                <p class="slds-text-heading_medium slds-align_absolute-center">
+                   
+                  {information.shipmentMode}
+                    
+                
+            </p>
+
+            </div>
+            </div>
+
+
+        </lightning-layout-item>
+
+
+</lightning-layout>
+
+</template>
+        <div class="checkout slds-p-top_medium">
+            <lightning-button variant="brand" label="PROCEED TO CHECKOUT" title="ProceedToCheckout" onclick={handleCheckoutClick} disabled={information.preventCheckout} style="display: grid; width: 100%; text-transform: uppercase; border-radius: 0;"></lightning-button>
+        </div>
+
+        <template if:true={information.preventCheckout}>
+            <p class="slds-p-top_small"></p>
+            
+            <p class="error-message"></p>
+                <p class="slds-text-heading_medium slds-p-top_small error">You are unable to initiate checkout at this time</p>
+
+            </p>
+           
+        </template>
+    
+        <template if:true={information.invalidCart}>
+            <p class="slds-p-top_small"></p>
+            
+            <p class="error-message"></p>
+                <p class="slds-text-heading_small slds-p-top_small">Samples and Products cannot be processed in the same checkout transaction. Please remove the sample items and submit a separate order.</p>
+
+            </p>
+           
+        </template>
+
+    
+
+   
+</template>

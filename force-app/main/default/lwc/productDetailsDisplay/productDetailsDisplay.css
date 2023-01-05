@@ -48,10 +48,8 @@ img {
     align-self: end;
 }
 
-.decrement-btn {
-    background: none;
-    border: none;
-    border-right: var(--lwc-borderWidthThin, 1px) solid var(--lwc-colorBorder, var(--dxp-g-neutral-1));
+.product-detail-buttons {
+    align-items: center;
 }
 
 /* CSS Styling for narrow screens (e.g. phones) */

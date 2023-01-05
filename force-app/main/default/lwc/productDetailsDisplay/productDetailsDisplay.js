@@ -33,6 +33,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     @track products = [];
     @track cart;
     @track cartConfig;
+    @track decrementButtonDisabled = true;
     
     /**
      * Gets or sets the unique identifier of a product.
@@ -505,5 +506,15 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         console.log('escapeHtml text = ' + text.replace(/[&<>"']/g, function(m) { return map[m]; }));
         
         return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    incrementQuantity() {
+        this._quantityFieldValue += 1;
+        this.decrementButtonDisabled = false;
+    }
+
+    decrementQuantity() {
+        this._quantityFieldValue = this._quantityFieldValue > 1 ? this._quantityFieldValue -= 1 : this._quantityFieldValue;
+        this.decrementButtonDisabled = this._quantityFieldValue === 1 ? true : this.decrementButtonDisabled;
     }
 }

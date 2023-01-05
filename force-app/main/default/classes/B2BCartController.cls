@@ -124,6 +124,12 @@ public with sharing class B2BCartController {
     );
   }
 
+  @AuraEnabled
+  public static WebCart getCartFields(String activeCartOrId) {
+    WebCart cartInformation = [SELECT  Id, Name FROM WebCart WHERE Id = :activeCartOrId];
+    return cartInformation; 
+  }
+
   /**
    * @description Demonstrates how to call ConnectApi.CommerceCart.createCart
    * @param  communityId The Id of the community from which the call originated

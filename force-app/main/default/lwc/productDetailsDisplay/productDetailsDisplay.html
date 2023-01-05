@@ -72,19 +72,44 @@
                 </div>
 
 
-                <div class="slds-p-around_medium lgc-bg">
-                    <lightning-layout>
+                <div>
+                    <lightning-layout class="product-detail-buttons">
                         <lightning-layout-item>
-                            <label class="slds-m-right_x-small">QTY</label>
+                            <label>QTY</label>
                         </lightning-layout-item>
                         <lightning-layout-item padding="around-small">
-                            <lightning-button-icon icon-name="utility:add"  alternative-text="increment" title="increment" variant='brand'></lightning-button-icon>
+                            <lightning-button-icon 
+                                icon-name="utility:dash"  
+                                alternative-text="Decrease the number of items" 
+                                title="Decrease the number of items" 
+                                variant='brand'
+                                disabled={decrementButtonDisabled}
+                                onclick={decrementQuantity}>
+                            </lightning-button-icon>
+                        </lightning-layout-item>
+                        <lightning-layout-item>
+                            <lightning-input
+                                type="number"
+                                name="quantity"
+                                variant="label-hidden"
+                                label=""
+                                value={_quantityFieldValue}
+                                min="1"
+                                max="9999"
+                                step="1"
+                                message-when-step-mismatch="Enter a whole number."
+                                oncommit={handleQuantityChange}
+                            >
+                            </lightning-input>
                         </lightning-layout-item>
                         <lightning-layout-item padding="around-small">
-                            <lightning-input type="number" value="1" variant="label-hidden"></lightning-input>
-                        </lightning-layout-item>
-                        <lightning-layout-item padding="around-small">
-                            <lightning-button-icon icon-name="utility:dash"  alternative-text="decrement" title="decrement" variant='brand'></lightning-button-icon>
+                            <lightning-button-icon 
+                                icon-name="utility:add"  
+                                alternative-text="Increase the number of items" 
+                                title="Increase the number of items" 
+                                variant='brand'
+                                onclick={incrementQuantity}>
+                            </lightning-button-icon>
                         </lightning-layout-item>
                         <lightning-layout-item>
                             <lightning-button
