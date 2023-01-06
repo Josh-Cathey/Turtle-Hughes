@@ -51,9 +51,11 @@ public without sharing class AdVic_GuestCartController {
 
     @AuraEnabled
     public static Guest_Cart_Item__c addProductToCart(String cartId, String productId, Integer quantity) {
+        // Get the products name for the guest cart item
+        Product2 product = [SELECT Id, Name FROM Product2 WHERE Id = :productId];
         Guest_Cart_Item__c newCartItem = new Guest_Cart_Item__c(
             Guest_Cart__c = cartId, 
-            Name = 'SFDevJC', // Need to figure out our naming convention here
+            Name = product.Name,
             Product__c = productId,
             Quantity__c = quantity 
         );

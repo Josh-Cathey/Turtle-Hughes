@@ -204,8 +204,8 @@ export default class relatedProducts extends NavigationMixin(LightningElement) {
      });
      //searchForProductMetadata(String cmsContentType, String cmsContentFieldName, String matchingRecord){
      //myContent = content;
- 
      myCSProducts = JSON.parse(JSON.stringify(myCrossSellProducts));
+
      window.console.log("myCrossSellProducts:", myCSProducts);
      this.nbRecommendedItems = myCSProducts.length;
      const myCurrentProductPageURL = await searchCurrentProductPageURL();
@@ -238,10 +238,13 @@ export default class relatedProducts extends NavigationMixin(LightningElement) {
          "SKU value: ",
          myCSProducts[i].fields.StockKeepingUnit
        );
-       window.console.log(
-         "Image Alternative value: ",
-         myCSProducts[i].defaultImage.alternativeText
-       );
+
+
+           window.console.log(
+               "Image Alternative value: ",
+               myCSProducts[i].defaultImage.alternativeText
+           );
+       
        //Get (and update) Description for this CrossSell Product
        if (myCSProducts[i].fields.Description != null) {
          //window.console.log('myDescription:', myContent[i].contentNodes.Description.value);
@@ -255,13 +258,14 @@ export default class relatedProducts extends NavigationMixin(LightningElement) {
            .replace("&lt;br&gt;", "");
        }
        //Get Image for this CrossSell Product
-       if (myCSProducts[i].defaultImage.url != null) {
-         window.console.log("URL value: ", myCSProducts[i].defaultImage.url);
-         myCSProducts[i].defaultImage.url = this.resolve(
-           myCSProducts[i].defaultImage.url
-         );
-         window.console.log("URL value: ", myCSProducts[i].defaultImage.url);
-       }
+             if (myCSProducts[i].defaultImage.url != null) {
+                 window.console.log("URL value: ", myCSProducts[i].defaultImage.url);
+                 myCSProducts[i].defaultImage.url = this.resolve(
+                     myCSProducts[i].defaultImage.url
+                 );
+                 window.console.log("URL value: ", myCSProducts[i].defaultImage.url);
+             }
+
      }
      // ### IMPORTANT REPLACE THE FOLLOWING LINE AND REMOVE AWAIT IN LOOP
      // Wait for every promise in the loop for getProductPrice
