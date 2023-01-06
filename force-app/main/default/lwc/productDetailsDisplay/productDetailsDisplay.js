@@ -491,6 +491,13 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     }
 
     showAddToCartNotification(productName) {
+        // const evt = new ShowToastEvent({
+        //     title: 'Success',
+        //     message: 'Your cart has been updated.',
+        //     variant: 'success',
+        // });
+        // this.dispatchEvent(evt);
+
         this.addToCartMessage = productName + ' has been added to your cart';
         this.showAddToCartModal = true;
     }
