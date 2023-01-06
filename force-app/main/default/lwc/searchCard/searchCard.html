@@ -88,5 +88,38 @@
             </section>
                 <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
         </template>
+
+        <!-- ADD TO CART TOAST MESSAGE -->
+        <template if:true={showAddToCartModal}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="max-width: 80rem;">
+                    <lightning-icon
+                        style="padding-bottom: 0.5rem; text-align: right; cursor: pointer;"
+                        icon-name="utility:close"
+                        size="small"
+                        alternative-text="Close Modal"
+                        variant="inverse"
+                        onclick={closeAddToCartPrompt}
+                    >
+                    </lightning-icon>
+                    <div class="slds-modal__content">
+                        <h1 class="slds-modal__title slds-align_absolute-center slds-p-around_small add-to-cart-prompt-title ">
+                            <lightning-icon 
+                                icon-name="utility:success" 
+                                size="small"
+                                variant="success"
+                                style="padding: 0.5rem;"
+                            >
+                            </lightning-icon>
+                            Success 
+                        </h1>
+                        <label class="slds-modal__title slds-align_absolute-center slds-p-around_small">
+                            <lightning-formatted-rich-text value={addToCartMessage}></lightning-formatted-rich-text>
+                        </label>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
     </article>
 </template>

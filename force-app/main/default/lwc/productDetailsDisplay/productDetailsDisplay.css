@@ -52,8 +52,21 @@ img {
     align-items: center;
 }
 
+.add-to-cart-prompt-title {
+    font-size: 24px;
+}
+
+.quantity-input {
+    width: 4rem;
+    /* text-align: center; */
+}
+
+.quantity-input input {
+    text-align: center;
+}
+
 /* CSS Styling for narrow screens (e.g. phones) */
-@media only screen and (max-width: 48em) {
+@media only screen and (max-width: 900px) {
     /* SLDS token: mqSmall */
     .product-information {
         flex-direction: column;
@@ -70,5 +83,9 @@ img {
     figure {
         width: 200px;
         height: 200px;
+    }
+
+    .add-to-buttons {
+        width: 100%;
     }
 }

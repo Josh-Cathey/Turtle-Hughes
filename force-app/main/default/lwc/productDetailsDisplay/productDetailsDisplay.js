@@ -34,6 +34,8 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     @track cart;
     @track cartConfig;
     @track decrementButtonDisabled = true;
+    @track showAddToCartModal = false;
+    @track addToCartMessage = '';
     
     /**
      * Gets or sets the unique identifier of a product.
@@ -290,11 +292,11 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             );
         }
         else if (isGuest && this.cartConfig != null) {
-            console.log('check 1');
+            // console.log('check 1');
             this.addItemToGuestCart();
         }
         else if (isGuest && this.cartConfig == null) {
-            console.log('check 2');
+            // console.log('check 2');
             this.getCartFromLocalStorage();
             this.promptGuestToSignIn = true;
         }
@@ -320,8 +322,6 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         const path = [homePage].concat(
             newPath.map((level) => ({
                 name: level.name,
-                //name: this.escapeHtml(level.name),
-                //name: level.name.text(),
                 type: 'standard__recordPage',
                 attributes: {
                     actionName: 'view',
@@ -389,6 +389,11 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         this.promptGuestToSignIn = false;
     }
 
+    closeAddToCartPrompt() {
+        this.showAddToCartModal = false;
+        this.addToCartMessage = '';
+    }
+
     continueAsGuest() {
         this.checkoutAsGuest = true;
         this.promptGuestToSignIn = false;
@@ -406,14 +411,14 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     }
 
     addItemToGuestCart() {
-        console.log(' check 3 ');
+        // console.log(' check 3 ');
         var foundMatchingItem = false;
         for (var i = 0; i < this.products.length; i++) {
             if (this.products[i].Product__c === this.recordId) {
                 foundMatchingItem = true;
 
                 // TESTING
-                console.log('Attempting to add ' + this._quantityFieldValue + ' to productId ' + this.products[i].Product__c);
+                // console.log('Attempting to add ' + this._quantityFieldValue + ' to productId ' + this.products[i].Product__c);
 
                 // if found, increment the quantity on the product
                 // update the guest cart item record in apex
@@ -422,12 +427,12 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                     .then((data) => {
                         this.products[i] = data;
                         this.updateCart();
-                        console.log(' check 4 ');
+                        // console.log(' check 4 ');
                         this.setCartToLocalStorage();
                         // window.location.reload();
 
                         // Display a popup so the user knows the product has been added to their cart
-                        this.showAddToCartNotification();
+                        this.showAddToCartNotification(this.name);
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -447,7 +452,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                     publish(this.messageContext, SAMPLEMC, undefined);       
 
                     // Display a popup so the user knows the product has been added to their cart
-                    this.showAddToCartNotification();
+                    this.showAddToCartNotification(this.name);
 
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
@@ -485,27 +490,9 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         }
     }
 
-    showAddToCartNotification() {
-        const evt = new ShowToastEvent({
-            title: 'Success',
-            message: 'Your cart has been updated.',
-            variant: 'success',
-        });
-        this.dispatchEvent(evt);
-    }
-
-    escapeHtml(text) {
-        var map = {
-            '&amp;': '&#38;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        console.log('text = ' + text);
-        console.log('escapeHtml text = ' + text.replace(/[&<>"']/g, function(m) { return map[m]; }));
-        
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    showAddToCartNotification(productName) {
+        this.addToCartMessage = productName + ' has been added to your cart';
+        this.showAddToCartModal = true;
     }
 
     incrementQuantity() {

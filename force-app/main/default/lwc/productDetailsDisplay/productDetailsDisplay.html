@@ -70,8 +70,6 @@
                         </lightning-formatted-number>
                     </b>
                 </div>
-
-
                 <div>
                     <lightning-layout class="product-detail-buttons">
                         <lightning-layout-item>
@@ -93,6 +91,7 @@
                                 name="quantity"
                                 variant="label-hidden"
                                 label=""
+                                class="quantity-input"
                                 value={_quantityFieldValue}
                                 min="1"
                                 max="9999"
@@ -111,21 +110,21 @@
                                 onclick={incrementQuantity}>
                             </lightning-button-icon>
                         </lightning-layout-item>
-                        <lightning-layout-item>
+                        <lightning-layout-item class="add-to-buttons">
                             <lightning-button
                                 label="Add to Cart"
                                 variant="brand"
-                                class="slds-m-left_x-small"
+                                class="slds-m-left_x-small slds-size_1-of-6"
                                 disabled={_isAddToCartDisabled}
                                 onclick={notifyAddToCart}
                             >
                             </lightning-button>
                         </lightning-layout-item>
-                        <lightning-layout-item>
+                        <lightning-layout-item class="add-to-buttons">
                             <lightning-button
                                 label="Add to List"
                                 variant="brand"
-                                class="slds-m-left_x-small"
+                                class="slds-m-left_x-small slds-size_1-of-6"
                                 onclick={notifyCreateAndAddToList}
                             >
                             </lightning-button>
@@ -135,118 +134,69 @@
             </div>
         </div>
 
-                <!-- <div class="container" style="display: block; width: min-content;">
-                    <span class="slds-m-bottom_small">
-                        <span class="quantity-selector slds-grid slds-grid_vertical-align-center">
-                            <label class="slds-m-right_x-small">QTY</label>
-                            <span class="controls slds-m-right_small">
-                                <lightning-button-icon icon-name="utility:add"  alternative-text="increment" title="increment" variant='brand'></lightning-button-icon>
-                                </button>
-                                <lightning-input
-                                    class="selector-input"
-                                    type="number"
-                                    name="quantity"
-                                    label=""
-                                    value="1"
-                                    min="1"
-                                    max="9999"
-                                    step="1"
-                                    message-when-step-mismatch="Enter a whole number."
-                                    oncommit={handleQuantityChange}
-                                >
-                                </lightning-input>
-                                <button class="increment-btn slds-p-horizontal_xx-small slds-p-vertical_x-small">
-                                    <lightning-icon 
-                                        class="btn-icon slds-icon-utility-add slds-icon_container"
-                                        title="Increase the number of items"
-                                    >
-                                    </lightning-icon>
-                                </button>
-                            </span>
-                        </span>
-                    </span> -->
-
-
-                    <!-- <lightning-layout vertical-align="end">
-                        <lightning-layout-item size="2">
-                            <lightning-input
-                                type="number"
-                                name="quantity"
-                                label="QTY"
-                                value="1"
-                                min="1"
-                                max="9999"
-                                step="1"
-                                message-when-step-mismatch="Enter a whole number."
-                                oncommit={handleQuantityChange}
-                            >
-                            </lightning-input>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-button
-                                label="Add to Cart"
-                                variant="brand"
-                                class="slds-m-left_x-small"
-                                disabled={_isAddToCartDisabled}
-                                onclick={notifyAddToCart}
-                            >
-                            </lightning-button>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-button
-                                label="Add to List"
-                                variant="brand"
-                                class="slds-m-left_x-small"
-                                onclick={notifyCreateAndAddToList}
-                            >
-                            </lightning-button>
-                        </lightning-layout-item>
-                    </lightning-layout>
-                </div>
-            </div> -->
-            <!-- <lightning-accordion
-                active-section-name="description"
-                allow-multiple-sections-open
-            >
-                <lightning-accordion-section
-                    name="description"
-                    label="Description"
-                >
-                    <lightning-formatted-rich-text
-                        value={description}
-                    ></lightning-formatted-rich-text>
-                </lightning-accordion-section>
-            </lightning-accordion> -->
-            <template if:true={promptGuestToSignIn}>
-                <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
-                    <div class="slds-modal__container">
-                        <lightning-icon
-                            style="padding-bottom: 0.5rem; text-align: right; cursor: pointer;"
-                            icon-name="utility:close"
-                            size="small"
-                            alternative-text="Close Modal"
-                            variant="inverse"
-                            onclick={closeModal}
-                        >
-                        </lightning-icon>
-                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                            <h1 class="slds-modal__title slds-hyphenate slds-align_absolute-center">Please log in or create an account to add items to your cart</h1>
-                        </div>
-                        <div class="slds-modal__footer slds-modal__footer_directional">
-                            <a class="slds-button slds-button_neutral"  onclick={continueAsGuest}>
-                                Continue as Guest
-                            </a>
-                            <a class="slds-button slds-button_neutral" href={createAccountUrl} onclick={guestBrowsingCreateAccount}>
-                                Create an Account
-                            </a>
-                            <button class="slds-button slds-button_brand" onclick={guestBrowsingLogin}>
-                                Log In
-                            </button>
-                        </div>
+        <!-- GUEST USER MODAL (OPTIONS: CONTINUE AS GUEST, LOG IN, REGISTER) -->
+        <template if:true={promptGuestToSignIn}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <lightning-icon
+                        style="padding-bottom: 0.5rem; text-align: right; cursor: pointer;"
+                        icon-name="utility:close"
+                        size="small"
+                        alternative-text="Close Modal"
+                        variant="inverse"
+                        onclick={closeModal}
+                    >
+                    </lightning-icon>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <h1 class="slds-modal__title slds-hyphenate slds-align_absolute-center">Please log in or create an account to add items to your cart</h1>
                     </div>
-                </section>
-                    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
-            </template>
-        <!-- </div> -->
+                    <div class="slds-modal__footer slds-modal__footer_directional">
+                        <a class="slds-button slds-button_neutral"  onclick={continueAsGuest}>
+                            Continue as Guest
+                        </a>
+                        <a class="slds-button slds-button_neutral" href={createAccountUrl} onclick={guestBrowsingCreateAccount}>
+                            Create an Account
+                        </a>
+                        <button class="slds-button slds-button_brand" onclick={guestBrowsingLogin}>
+                            Log In
+                        </button>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
+
+        <!-- ADD TO CART TOAST MESSAGE -->
+        <template if:true={showAddToCartModal}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="max-width: 80rem;">
+                    <lightning-icon
+                        style="padding-bottom: 0.5rem; text-align: right; cursor: pointer;"
+                        icon-name="utility:close"
+                        size="small"
+                        alternative-text="Close Modal"
+                        variant="inverse"
+                        onclick={closeAddToCartPrompt}
+                    >
+                    </lightning-icon>
+                    <div class="slds-modal__content">
+                        <h1 class="slds-modal__title slds-align_absolute-center slds-p-around_small add-to-cart-prompt-title ">
+                            <lightning-icon 
+                                icon-name="utility:success" 
+                                size="small"
+                                variant="success"
+                                style="padding: 0.5rem;"
+                            >
+                            </lightning-icon>
+                            Success 
+                        </h1>
+                        <label class="slds-modal__title slds-align_absolute-center slds-p-around_small">
+                            <lightning-formatted-rich-text value={addToCartMessage}></lightning-formatted-rich-text>
+                        </label>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
     </div>
 </template>

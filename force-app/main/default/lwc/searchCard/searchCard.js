@@ -23,6 +23,8 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
     @track products = [];
     @track cart;
     @track cartConfig;
+    @track showAddToCartModal = false;
+    @track addToCartMessage = '';
 
     /**
      * An event fired when the user clicked on the action button. Here in this
@@ -277,15 +279,6 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         //console.log('productDetailsDisplay.js: this.displayData.id (Id of the product) = ' + this.displayData.id);
         if (this.cartConfig == null && isGuest) {
             this.getCartFromLocalStorage();
-            
-            // console.log('Inside ConnectedCallback(): cartConfig');
-            // console.log(JSON.parse(JSON.stringify(this.cartConfig)));
-
-            // console.log('Inside ConnectedCallback(): cart');
-            // console.log(JSON.parse(JSON.stringify(this.cart)));
-
-            // console.log('Inside ConnectedCallback(): products');
-            // console.log(JSON.parse(JSON.stringify(this.products)));
         }
     }
 
@@ -395,8 +388,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                         this.updateCart();
                         this.setCartToLocalStorage();
 
+                        console.log('product name = ' + data.Name);
                         // Display a popup so the user knows the product has been added to their cart
-                        this.showAddToCartNotification();
+                        this.showAddToCartNotification(data.Name);
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -412,8 +406,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                     this.updateCart();
                     this.setCartToLocalStorage();
 
+                    console.log('product name = ' + data.Name);
                     // Display a popup so the user knows the product has been added to their cart
-                    this.showAddToCartNotification();
+                    this.showAddToCartNotification(data.Name);
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
         }
@@ -449,12 +444,13 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         }
     }
 
-    showAddToCartNotification() {
-        const evt = new ShowToastEvent({
-            title: 'Success',
-            message: 'Your cart has been updated.',
-            variant: 'success',
-        });
-        this.dispatchEvent(evt);
+    showAddToCartNotification(productName) {
+        this.addToCartMessage = productName + ' has been added to your cart';
+        this.showAddToCartModal = true;
+    }
+
+    closeAddToCartPrompt() {
+        this.showAddToCartModal = false;
+        this.addToCartMessage = '';
     }
 }
