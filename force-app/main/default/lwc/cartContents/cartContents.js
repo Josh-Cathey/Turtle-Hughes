@@ -7,6 +7,7 @@ import updateCartItem from '@salesforce/apex/B2BCartController.updateCartItem';
 import deleteCartItem from '@salesforce/apex/B2BCartController.deleteCartItem';
 import deleteCart from '@salesforce/apex/B2BCartController.deleteCart';
 import createCart from '@salesforce/apex/B2BCartController.createCart';
+import isGuest from '@salesforce/user/isGuest';
 
 import { fireEvent } from 'c/pubsub';
 import { isCartClosed } from 'c/cartUtils';
@@ -294,8 +295,14 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * This lifecycle hook fires when this component is inserted into the DOM.
      */
     connectedCallback() {
-        // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
-        this.updateCartItems();
+
+        if (isGuest){
+            this.getCartFromLocalStorage();
+        }
+        else {
+            // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
+            this.updateCartItems();
+        }
     }
 
     /**
@@ -522,5 +529,14 @@ export default class CartContents extends NavigationMixin(LightningElement) {
         this._cartItemCount = count;
         // Update the cart badge and notify any components interested with this change
         this.handleCartUpdate();
+    }
+
+    // Logic for guests
+    getCartFromLocalStorage() {
+        this.cartConfig = JSON.parse(localStorage.getItem('cart'));
+        if (this.cartConfig != null) {
+            this.products = this.cartConfig.products;
+            this.cart = this.cartConfig.cart;
+        }
     }
 }
