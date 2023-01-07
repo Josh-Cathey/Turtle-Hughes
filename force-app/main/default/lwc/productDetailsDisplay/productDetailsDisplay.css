@@ -41,15 +41,10 @@ img {
     flex-direction: column;
     flex-grow: 1;
     align-items: stretch;
-    min-height: 400px;
 }
 
 .price {
-    align-self: end;
-}
-
-.product-detail-buttons {
-    align-items: center;
+    font-size: larger;
 }
 
 .add-to-cart-prompt-title {
@@ -58,15 +53,28 @@ img {
 
 .quantity-input {
     width: 4rem;
-    /* text-align: center; */
-}
-
-.quantity-input input {
     text-align: center;
 }
 
+
+.product-quantity-selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.align-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.add-to-list-button {
+    padding-left: 5px;
+}
+
 /* CSS Styling for narrow screens (e.g. phones) */
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 850px) {
     /* SLDS token: mqSmall */
     .product-information {
         flex-direction: column;
@@ -81,11 +89,73 @@ img {
     }
 
     figure {
+        width: 400px;
+        height: 400px;
+    }
+
+    .add-to-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        padding: 5px;
+    }
+
+    .add-to-list-button {
+        padding-top: 5px;
+        padding-left: 0;
+    }
+
+    .product-quantity-selector {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-items: center;
+    }
+
+    .price {
+        /* align-self: normal; */
+    }
+
+    .quantity-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .product-detail-buttons {
+        justify-content: center;
+    }
+
+    .button-styles {
+        width: 600px;
+        height: 40px;
+    }
+
+    .align-section {
+        flex-direction: column;
+    }
+
+    .heading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 1rem;
+    }
+}
+
+@media only screen and (max-width: 650px) {
+    .button-styles {
+        width: 450px;
+    }
+}
+
+@media only screen and (max-width: 475px) {
+    figure {
         width: 200px;
         height: 200px;
     }
 
-    .add-to-buttons {
-        width: 100%;
+    .button-styles {
+        width: 350px;
     }
 }

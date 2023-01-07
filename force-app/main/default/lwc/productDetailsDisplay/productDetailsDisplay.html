@@ -56,9 +56,13 @@
                     <span class="slds-p-horizontal_small">Out of stock</span>
                 </div>
             </div>
-            <div>
+            <div class="quantity-group">
                 <div class="price">
                     <span if:false={hasPrice}>Price Unavailable</span>
+                    <lightning-formatted-text   
+                        value="Your Price: "
+                    >
+                    </lightning-formatted-text>
                     <b>
                         <lightning-formatted-number
                             if:true={hasPrice}
@@ -70,64 +74,53 @@
                         </lightning-formatted-number>
                     </b>
                 </div>
-                <div>
+                <div class="align-section">
                     <lightning-layout class="product-detail-buttons">
+                        <lightning-layout class="product-quantity-selector">
+                            <lightning-layout-item>
+                                <label>QTY</label>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small">
+                                <lightning-button-icon 
+                                    icon-name="utility:dash"  
+                                    alternative-text="Decrease the number of items" 
+                                    title="Decrease the number of items" 
+                                    variant='brand'
+                                    disabled={decrementButtonDisabled}
+                                    onclick={decrementQuantity}>
+                                </lightning-button-icon>
+                            </lightning-layout-item>
+                            <lightning-layout-item>
+                                <input type="number" class="quantity-input slds-input" value={_quantityFieldValue} oncommit={handleQuantityChange}>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small">
+                                <lightning-button-icon 
+                                    icon-name="utility:add"  
+                                    alternative-text="Increase the number of items" 
+                                    title="Increase the number of items" 
+                                    variant='brand'
+                                    onclick={incrementQuantity}>
+                                </lightning-button-icon>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout>
+                    <lightning-layout class="add-to-buttons">
                         <lightning-layout-item>
-                            <label>QTY</label>
-                        </lightning-layout-item>
-                        <lightning-layout-item padding="around-small">
-                            <lightning-button-icon 
-                                icon-name="utility:dash"  
-                                alternative-text="Decrease the number of items" 
-                                title="Decrease the number of items" 
-                                variant='brand'
-                                disabled={decrementButtonDisabled}
-                                onclick={decrementQuantity}>
-                            </lightning-button-icon>
-                        </lightning-layout-item>
-                        <lightning-layout-item>
-                            <lightning-input
-                                type="number"
-                                name="quantity"
-                                variant="label-hidden"
-                                label=""
-                                class="quantity-input"
-                                value={_quantityFieldValue}
-                                min="1"
-                                max="9999"
-                                step="1"
-                                message-when-step-mismatch="Enter a whole number."
-                                oncommit={handleQuantityChange}
-                            >
-                            </lightning-input>
-                        </lightning-layout-item>
-                        <lightning-layout-item padding="around-small">
-                            <lightning-button-icon 
-                                icon-name="utility:add"  
-                                alternative-text="Increase the number of items" 
-                                title="Increase the number of items" 
-                                variant='brand'
-                                onclick={incrementQuantity}>
-                            </lightning-button-icon>
-                        </lightning-layout-item>
-                        <lightning-layout-item class="add-to-buttons">
-                            <lightning-button
-                                label="Add to Cart"
-                                variant="brand"
-                                class="slds-m-left_x-small slds-size_1-of-6"
+                            <button
                                 disabled={_isAddToCartDisabled}
                                 onclick={notifyAddToCart}
+                                class="slds-button slds-button_brand slds-button_stretch button-styles"
                             >
-                            </lightning-button>
+                                ADD TO CART
+                            </button>
                         </lightning-layout-item>
-                        <lightning-layout-item class="add-to-buttons">
-                            <lightning-button
-                                label="Add to List"
-                                variant="brand"
-                                class="slds-m-left_x-small slds-size_1-of-6"
+                        <lightning-layout-item class="add-to-list-button">
+                            <button
                                 onclick={notifyCreateAndAddToList}
+                                class="slds-button slds-button_brand slds-button_stretch button-styles"
                             >
-                            </lightning-button>
+                                ADD TO LIST
+                            </button>
                         </lightning-layout-item>
                     </lightning-layout>
                 </div>
