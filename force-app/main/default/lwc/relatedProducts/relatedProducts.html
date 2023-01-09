@@ -7,12 +7,12 @@
       >
      
         <template for:each={CSModifiedProducts} for:item="Product">
-          <lightning-layout key={Product.id} multiple-rows>
+          <lightning-layout key={Product.id} multiple-rows class="productHolder">
              
             <lightning-layout-item padding="around-small" size="6">
               <lightning-layout>
                 <lightning-layout-item padding="around-small" size="12">
-                  <figure class="slds-image slds-image--card">
+                  <figure class="slds-image slds-image_card">
                       <img
                         src={Product.defaultImage.url}
                         style="max-width: 50%; max-height: 200px;"

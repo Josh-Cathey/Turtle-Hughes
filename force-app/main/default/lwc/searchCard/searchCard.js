@@ -1,4 +1,4 @@
-import { LightningElement, api, track } from 'lwc';
+import {LightningElement, api, track, wire} from 'lwc';
 import isGuest from '@salesforce/user/isGuest';
 import { getDataConnectorSourceFields } from 'lightning/analyticsWaveApi';
 import communityBasePath from '@salesforce/community/basePath';
@@ -8,6 +8,12 @@ import addProductToCart from '@salesforce/apex/AdVic_GuestCartController.addProd
 import adjustProductQuantity from '@salesforce/apex/AdVic_GuestCartController.adjustProductQuantity';
 import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import {
+    publish,
+    APPLICATION_SCOPE,
+    MessageContext
+} from 'lightning/messageService';
+import SAMPLEMC from "@salesforce/messageChannel/MyMessageChannel__c";
 
 /**
  * An organized display of a single product card.
@@ -23,6 +29,8 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
     @track products = [];
     @track cart;
     @track cartConfig;
+    @track showAddToCartModal = false;
+    @track addToCartMessage = '';
 
     /**
      * An event fired when the user clicked on the action button. Here in this
@@ -139,6 +147,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
      */
     @api
     config;
+
+    @wire(MessageContext)
+    messageContext;
 
     /**
      * Gets the product image.
@@ -277,15 +288,6 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         //console.log('productDetailsDisplay.js: this.displayData.id (Id of the product) = ' + this.displayData.id);
         if (this.cartConfig == null && isGuest) {
             this.getCartFromLocalStorage();
-            
-            // console.log('Inside ConnectedCallback(): cartConfig');
-            // console.log(JSON.parse(JSON.stringify(this.cartConfig)));
-
-            // console.log('Inside ConnectedCallback(): cart');
-            // console.log(JSON.parse(JSON.stringify(this.cart)));
-
-            // console.log('Inside ConnectedCallback(): products');
-            // console.log(JSON.parse(JSON.stringify(this.products)));
         }
     }
 
@@ -395,8 +397,9 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                         this.updateCart();
                         this.setCartToLocalStorage();
 
+                        console.log('product name = ' + data.Name);
                         // Display a popup so the user knows the product has been added to their cart
-                        this.showAddToCartNotification();
+                        this.showAddToCartNotification(data.Name);
                     })
                     .catch(error => { console.error('Error adjusting quantity for guest cart item -> ' + error); })
 
@@ -412,8 +415,11 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                     this.updateCart();
                     this.setCartToLocalStorage();
 
+                    console.log('product name = ' + data.Name);
                     // Display a popup so the user knows the product has been added to their cart
-                    this.showAddToCartNotification();
+                    this.showAddToCartNotification(data.Name);
+                    const payload = { outcome:  'Added'};
+                    publish(this.messageContext, SAMPLEMC, payload);
                 })
                 .catch(error => { console.error('Error creating guest cart item -> ' + error); })
         }
@@ -449,12 +455,13 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
         }
     }
 
-    showAddToCartNotification() {
-        const evt = new ShowToastEvent({
-            title: 'Success',
-            message: 'Your cart has been updated.',
-            variant: 'success',
-        });
-        this.dispatchEvent(evt);
+    showAddToCartNotification(productName) {
+        this.addToCartMessage = productName + ' has been added to your cart';
+        this.showAddToCartModal = true;
+    }
+
+    closeAddToCartPrompt() {
+        this.showAddToCartModal = false;
+        this.addToCartMessage = '';
     }
 }

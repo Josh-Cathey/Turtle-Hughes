@@ -5,3 +5,9 @@
  .text {
     font-size: 1rem !important;
  }
+
+@media only screen and (min-width: 768px) {
+    .productHolder {
+        max-width: 25%
+    }
+}

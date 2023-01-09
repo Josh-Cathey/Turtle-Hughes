@@ -10,6 +10,9 @@ declare module "@salesforce/apex/B2BCartController.deleteCartItem" {
 declare module "@salesforce/apex/B2BCartController.getCartSummary" {
   export default function getCartSummary(param: {communityId: any, effectiveAccountId: any, activeCartOrId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/B2BCartController.getCartFields" {
+  export default function getCartFields(param: {activeCartOrId: any}): Promise<any>;
+}
 declare module "@salesforce/apex/B2BCartController.createCart" {
   export default function createCart(param: {communityId: any, effectiveAccountId: any}): Promise<any>;
 }

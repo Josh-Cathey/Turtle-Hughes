@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>55.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Proceed to Checkout Button</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__AppPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <!-- <property
+                name="recordId"
+                type="String"
+                label="Record Id"
+                description="Automatically bind the page's record id to the component variable"
+                default="{!recordId}"
+            />
+            <property
+                name="effectiveAccountId"
+                type="String"
+                label="Effective Account Id"
+                description="The ID of the account under which the user is acting (BETA)"
+                default="{!CurrentUser.effectiveAccountId}"
+            /> -->
+
+
+            <property
+                name="buttonLabel"
+                type="String"
+                label="Button Label"
+                description="Change the text on the proceed to checkout button"
+                default="Proceed To Checkout"
+            />
+            <property
+                name="buttonColor"
+                type="String"
+                label="Button Background Color"
+                description="Change the color of the proceed to checkout button"
+                default="#0176D3"
+            />
+            <property
+                name="buttonTextColor"
+                type="String"
+                label="Button Text Color"
+                description="Change the text color of the proceed to checkout button"
+                default="#FFFFFF"
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -32,7 +32,7 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
             this.subscription = subscribe(
                 this.messageContext,
                 SAMPLEMC,
-                (message) => this.connectedCallback(),
+                (message) => this.updateNumberOfItems(),
                 { scope: APPLICATION_SCOPE }
             );
         }
@@ -49,11 +49,10 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     nameByContentReferenceId = new Map();
     guestUser = isGuest;
     isLoading;
-    @track badgeNumber = 0 ;
+    @track badgeNumber =  0; //(localStorage.getItem('cartItemsCount').trim()) ;
     listOfGuestCartItems=[];
-    
-    
-   
+
+
 
     get welcomeGreeting() {
         return (this.currentUserFirstName ? 'Welcome, '   : 'Welcome');
@@ -135,6 +134,12 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
     connectedCallback() {
         this.subscribeToMessageChannel();
 
+        this.template.addEventListener('guestaddtocart', this.updateNumberOfItems());
+
+        if(localStorage.getItem('cartItemsCount')){
+            this.badgeNumber = localStorage.getItem('cartItemsCount').trim().valueOf();
+        }
+
         console.log('It is a guest'+this.guestUser);
         console.log('(this.cart == null) = ' + (this.cart == null));
         console.log('this.cart = ' + this.cart);
@@ -149,9 +154,10 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
                 this.listOfGuestCartItems = result;
                 if(this.listOfGuestCartItems.length == 0){
                     this.badgeNumber = 0;
+                    localStorage.setItem('cartItemsCount','' + this.badgeNumber)
                 }else{
                     this.badgeNumber = this.listOfGuestCartItems.length;
-                   
+                    localStorage.setItem('cartItemsCount','' + this.badgeNumber);
                 }
                 console.log(this.badgeNumber);
             }).catch(error=>{
@@ -189,5 +195,30 @@ export default class adVicStorefrontHeader extends NavigationMixin(LightningElem
         // return window.location.href('https://turtlehughes--uat.sandbox.my.site.com/s/guest-cart/a3T7c000000Ua4UEAS/sfdevjc');
     return window.open('https://turtlehughes--uat.sandbox.my.site.com/s/guest-cart/'+newVar.cart.Id+'/'+newVar.cart.Name,'_self');
     }
+
+    updateNumberOfItems(){
+        this.cart=this.getCartFromLocalStorage();
+        if (this.cart != null) {
+            var newVar = JSON.parse(JSON.stringify(this.cart));
+            console.log('Gcart 0.1 == ', newVar.cart.Id);
+            console.log('Gcart == ', JSON.parse(JSON.stringify(this.cart)));
+            console.log('Gcart 1 == ', this.cart);
+            getGuestCartItems({guestCartId: newVar.cart.Id}).then(result => {
+                console.log('result got>>' + JSON.stringify(result));
+                this.listOfGuestCartItems = result;
+                if (this.listOfGuestCartItems.length == 0) {
+                    this.badgeNumber = 0;
+                    localStorage.setItem('cartItemsCount','' + this.badgeNumber)
+                } else {
+                    this.badgeNumber = this.listOfGuestCartItems.length;
+                    localStorage.setItem('cartItemsCount','' + this.badgeNumber)
+                }
+                console.log(this.badgeNumber);
+            }).catch(error => {
+                console.log(error);
+            });
+        }
+    }
+
     
 }
