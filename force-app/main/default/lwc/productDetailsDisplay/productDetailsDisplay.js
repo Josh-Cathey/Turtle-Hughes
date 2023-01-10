@@ -211,17 +211,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
         if (this.cartConfig == null && isGuest) {
             this.getCartFromLocalStorage();
             console.log('Inside ConnectedCallback(): cartConfig');
-            //console.log(JSON.parse(JSON.stringify(this.cartConfig)));
-
-            //console.log('Inside ConnectedCallback(): cart');
-            //console.log(JSON.parse(JSON.stringify(this.cart)));
-
-          //  console.log('Inside ConnectedCallback(): products');
-           // console.log(JSON.parse(JSON.stringify(this.products)));
         }
-
-
-
 
         //this.recordId = this.recordId != null ? this.recordId : '01t7c00000748qsAAA'; // recordId is currently returning as undefined...
         this._resolveConnected();
@@ -417,9 +407,6 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
             if (this.products[i].Product__c === this.recordId) {
                 foundMatchingItem = true;
 
-                // TESTING
-                // console.log('Attempting to add ' + this._quantityFieldValue + ' to productId ' + this.products[i].Product__c);
-
                 // if found, increment the quantity on the product
                 // update the guest cart item record in apex
                 // then return the item, and update the item in the array
@@ -428,7 +415,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                         this.products[i] = data;
                         this.updateCart();
                         // console.log(' check 4 ');
-                        this.setCartToLocalStorage();
+                        //this.setCartToLocalStorage();
                         // window.location.reload();
 
                         // Display a popup so the user knows the product has been added to their cart
@@ -446,7 +433,7 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
                 .then((data) => {
                     this.products.push(data);
                     this.updateCart();
-                    this.setCartToLocalStorage();
+                    //this.setCartToLocalStorage();
                     //   eval("$A.get('e.force:refreshView').fire();");
                     // window.location.reload();
                     publish(this.messageContext, SAMPLEMC, undefined);       
@@ -464,9 +451,10 @@ export default class ProductDetailsDisplay extends NavigationMixin(LightningElem
     updateCart() {
         retrieveUpdatedGuestCart({cartId: this.cart.Id})
             .then((data) => {
-                 console.log('Calling retrieveUpdatedGuestCart');
-                 console.log('test 01.1 = ',data);
+                console.log('Calling retrieveUpdatedGuestCart');
+                console.log('test 01.1 = ', data);
                 this.cart = data;
+                this.setCartToLocalStorage();
             })
             .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
     }

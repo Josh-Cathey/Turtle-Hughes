@@ -1,4 +1,4 @@
-import { api, wire, LightningElement } from 'lwc';
+import { api, wire, LightningElement, track } from 'lwc';
 import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 
 import communityId from '@salesforce/community/Id';
@@ -30,6 +30,10 @@ const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout']);
  */
 
 export default class CartContents extends NavigationMixin(LightningElement) {
+    @track cartConfig;
+    @track products;
+    @track cart;
+
     /**
      * An event fired when the cart changes.
      * This event is a short term resolution to update the cart badge based on updates to the cart.
@@ -298,6 +302,8 @@ export default class CartContents extends NavigationMixin(LightningElement) {
 
         if (isGuest){
             this.getCartFromLocalStorage();
+            // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
+            this.updateCartItems();
         }
         else {
             // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
@@ -309,29 +315,38 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * Get a list of cart items from the server via imperative apex call
      */
     updateCartItems() {
-        // Call the 'getCartItems' apex method imperatively
-        getCartItems({
-            communityId: communityId,
-            effectiveAccountId: this.resolvedEffectiveAccountId,
-            activeCartOrId: this.recordId,
-            pageParam: this.pageParam,
-            sortParam: this.sortParam
-        })
-            .then((result) => {
-                this.cartItems = result.cartItems;
-                this._cartItemCount = Number(
-                    result.cartSummary.totalProductCount
-                );
-                this.currencyCode = result.cartSummary.currencyIsoCode;
-                this.isCartDisabled = LOCKED_CART_STATUSES.has(
-                    result.cartSummary.status
-                );
+        if(!isGuest) {
+            // Call the 'getCartItems' apex method imperatively
+            getCartItems({
+                communityId: communityId,
+                effectiveAccountId: this.resolvedEffectiveAccountId,
+                activeCartOrId: this.recordId,
+                pageParam: this.pageParam,
+                sortParam: this.sortParam
             })
-            .catch((error) => {
-                const errorMessage = error.body.message;
-                this.cartItems = undefined;
-                this.isCartClosed = isCartClosed(errorMessage);
-            });
+                .then((result) => {
+                    this.cartItems = result.cartItems;
+                    this._cartItemCount = Number(
+                        result.cartSummary.totalProductCount
+                    );
+                    this.currencyCode = result.cartSummary.currencyIsoCode;
+                    this.isCartDisabled = LOCKED_CART_STATUSES.has(
+                        result.cartSummary.status
+                    );
+                })
+                .catch((error) => {
+                    const errorMessage = error.body.message;
+                    this.cartItems = undefined;
+                    this.isCartClosed = isCartClosed(errorMessage);
+                });
+        }
+        else if (isGuest) {
+            this.cartItems = this.cartConfig.products;
+            this._cartItemCount = Number(this.cartConfig.products.length);
+            this.isCartDisabled = false;
+            this.isCartClosed = false;
+        }
+        
     }
 
     /**
@@ -533,10 +548,27 @@ export default class CartContents extends NavigationMixin(LightningElement) {
 
     // Logic for guests
     getCartFromLocalStorage() {
-        this.cartConfig = JSON.parse(localStorage.getItem('cart'));
-        if (this.cartConfig != null) {
-            this.products = this.cartConfig.products;
-            this.cart = this.cartConfig.cart;
+        var products;
+        var cart;
+        try {
+            cart = JSON.parse(localStorage.getItem('cart'));
+            if (cart != null) {
+                this.cartConfig = JSON.stringify(cart);
+                // products = JSON.parse(this.cartConfig.products);
+                this.products = JSON.stringify(cart.products);
+                
+                //cart = JSON.stringify(this.cartConfig.cart);
+                this.cart = JSON.stringify(cart.cart);
+            }
+            console.log('this.cartConfig');
+            console.log(JSON.parse(this.cartConfig));
+            console.log('this.products');
+            console.log(JSON.parse(this.products));
+            console.log('this.cart');
+            console.log(JSON.parse(this.cart));
+        }
+        catch(e) {
+            console.log(e);
         }
     }
 }

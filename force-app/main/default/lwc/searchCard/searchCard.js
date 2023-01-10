@@ -395,7 +395,7 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                     .then((data) => {
                         this.products[i] = data;
                         this.updateCart();
-                        this.setCartToLocalStorage();
+                        // this.setCartToLocalStorage();
 
                         console.log('product name = ' + data.Name);
                         // Display a popup so the user knows the product has been added to their cart
@@ -413,7 +413,7 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                 .then((data) => {
                     this.products.push(data);
                     this.updateCart();
-                    this.setCartToLocalStorage();
+                    // this.setCartToLocalStorage();
 
                     console.log('product name = ' + data.Name);
                     // Display a popup so the user knows the product has been added to their cart
@@ -431,6 +431,7 @@ export default class SearchCard extends NavigationMixin(LightningElement) {
                 // console.log('Calling retrieveUpdatedGuestCart');
                 // console.log(data);
                 this.cart = data;
+                this.setCartToLocalStorage();
             })
             .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
     }

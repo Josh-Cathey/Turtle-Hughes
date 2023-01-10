@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import isGuest from '@salesforce/user/isGuest';
 
 import { resolve } from 'c/cmsResourceResolver';
 import { getLabelForOriginalPrice, displayOriginalPrice } from 'c/cartUtils';
@@ -213,6 +214,12 @@ export default class Items extends NavigationMixin(LightningElement) {
      * This lifecycle hook fires when this component is inserted into the DOM.
      */
     connectedCallback() {
+
+        console.log('cartItems.connectedCallback: this.cartItems = ' + this.cartItems);
+        if (isGuest) {
+            console.log('cartItems.connectedCallback: this.cartItems = ' + this.cartItems);
+        }
+
         // Once connected, resolve the associated Promise.
         this._connectedResolver();
     }
@@ -235,29 +242,56 @@ export default class Items extends NavigationMixin(LightningElement) {
      * @private
      */
     get displayItems() {
-        return this._items.map((item) => {
-            // Create a copy of the item that we can safely mutate.
-            const newItem = { ...item };
-
-            // Set whether or not to display negotiated price
-            newItem.showNegotiatedPrice =
-                this.showNegotiatedPrice &&
-                (newItem.cartItem.totalPrice || '').length > 0;
-
-            // Set whether or not to display original price
-            newItem.showOriginalPrice = displayOriginalPrice(
-                this.showNegotiatedPrice,
-                this.showOriginalPrice,
-                newItem.cartItem.totalPrice,
-                newItem.cartItem.totalListPrice
-            );
-            // get the label for original price to provide to the aria-label attr for screen readers
-            newItem.originalPriceLabel = getLabelForOriginalPrice(
-                this.currencyCode,
-                newItem.cartItem.totalListPrice
-            );
-            return newItem;
-        });
+        if (!isGuest) {
+            return this._items.map((item) => {
+                // Create a copy of the item that we can safely mutate.
+                const newItem = { ...item };
+    
+                // Set whether or not to display negotiated price
+                newItem.showNegotiatedPrice =
+                    this.showNegotiatedPrice &&
+                    (newItem.cartItem.totalPrice || '').length > 0;
+    
+                // Set whether or not to display original price
+                newItem.showOriginalPrice = displayOriginalPrice(
+                    this.showNegotiatedPrice,
+                    this.showOriginalPrice,
+                    newItem.cartItem.totalPrice,
+                    newItem.cartItem.totalListPrice
+                );
+                // get the label for original price to provide to the aria-label attr for screen readers
+                newItem.originalPriceLabel = getLabelForOriginalPrice(
+                    this.currencyCode,
+                    newItem.cartItem.totalListPrice
+                );
+                return newItem;
+            });
+        }
+        else if (isGuest) {
+            return this._items.map((item) => {
+                // Create a copy of the item that we can safely mutate.
+                const newItem = { ...item };
+    
+                // Set whether or not to display negotiated price
+                newItem.showNegotiatedPrice =
+                    this.showNegotiatedPrice &&
+                    (newItem.cartItem.totalPrice || '').length > 0;
+    
+                // Set whether or not to display original price
+                newItem.showOriginalPrice = displayOriginalPrice(
+                    this.showNegotiatedPrice,
+                    this.showOriginalPrice,
+                    newItem.cartItem.totalPrice,
+                    newItem.cartItem.totalListPrice
+                );
+                // get the label for original price to provide to the aria-label attr for screen readers
+                newItem.originalPriceLabel = getLabelForOriginalPrice(
+                    this.currencyCode,
+                    newItem.cartItem.totalListPrice
+                );
+                return newItem;
+            });
+        }
     }
 
     /**
