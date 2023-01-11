@@ -1,6 +1,5 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import isGuest from '@salesforce/user/isGuest';
 
 import { resolve } from 'c/cmsResourceResolver';
 import { getLabelForOriginalPrice, displayOriginalPrice } from 'c/cartUtils';
@@ -137,90 +136,40 @@ export default class Items extends NavigationMixin(LightningElement) {
     }
 
     set cartItems(items) {
-        if (!isGuest) {
-            try {
-                this._providedItems = items;
-                const generatedUrls = [];
-                this._items = (items || []).map((item) => {
-                    // Create a copy of the item that we can safely mutate.
-                    const newItem = { ...item };
-                    // Set default value for productUrl
-                    newItem.productUrl = '';
-                    // Get URL of the product image.
-                    newItem.productImageUrl = resolve(
-                        item.cartItem.productDetails.thumbnailImage.url
-                    );
-                    // Set the alternative text of the image(if provided).
-                    // If not, set the null all text (alt='') for images.
-                    newItem.productImageAlternativeText =
-                        item.cartItem.productDetails.thumbnailImage.alternateText || '';
-    
-                    // Get URL for the product, which is asynchronous and can only happen after the component is connected to the DOM (NavigationMixin dependency).
-                    const urlGenerated = this._canResolveUrls
-                        .then(() =>
-                            this[NavigationMixin.GenerateUrl]({
-                                type: 'standard__recordPage',
-                                attributes: {
-                                    recordId: newItem.cartItem.productId,
-                                    objectApiName: 'Product2',
-                                    actionName: 'view'
-                                }
-                            })
-                        )
-                        .then((url) => {
-                            newItem.productUrl = url;
-                        });
-                    generatedUrls.push(urlGenerated);
-                    return newItem;
+        this._providedItems = items;
+        const generatedUrls = [];
+        this._items = (items || []).map((item) => {
+            // Create a copy of the item that we can safely mutate.
+            const newItem = { ...item };
+            // Set default value for productUrl
+            newItem.productUrl = '';
+            // Get URL of the product image.
+            newItem.productImageUrl = resolve(
+                item.cartItem.productDetails.thumbnailImage.url
+            );
+            // Set the alternative text of the image(if provided).
+            // If not, set the null all text (alt='') for images.
+            newItem.productImageAlternativeText =
+                item.cartItem.productDetails.thumbnailImage.alternateText || '';
+
+            // Get URL for the product, which is asynchronous and can only happen after the component is connected to the DOM (NavigationMixin dependency).
+            const urlGenerated = this._canResolveUrls
+                .then(() =>
+                    this[NavigationMixin.GenerateUrl]({
+                        type: 'standard__recordPage',
+                        attributes: {
+                            recordId: newItem.cartItem.productId,
+                            objectApiName: 'Product2',
+                            actionName: 'view'
+                        }
+                    })
+                )
+                .then((url) => {
+                    newItem.productUrl = url;
                 });
-            }
-            catch(e){
-                console.log(e);
-            }
-        }
-        else if (isGuest) {
-            try {
-                let guestItems = JSON.stringify(items);
-                this._providedItems = JSON.parse(guestItems);
-                const generatedUrls = [];
-                this._items = (items || []).map((item) => {
-                    // Create a copy of the item that we can safely mutate.
-                    const newItem = { ...item };
-                    // Set default value for productUrl
-                    newItem.productUrl = '';
-                    // Get URL of the product image.
-                    newItem.productImageUrl = resolve(
-                        item.cartItem.productDetails.thumbnailImage.url
-                    );
-                    // Set the alternative text of the image(if provided).
-                    // If not, set the null all text (alt='') for images.
-                    newItem.productImageAlternativeText =
-                        item.cartItem.productDetails.thumbnailImage.alternateText || '';
-    
-                    // Get URL for the product, which is asynchronous and can only happen after the component is connected to the DOM (NavigationMixin dependency).
-                    const urlGenerated = this._canResolveUrls
-                        .then(() =>
-                            this[NavigationMixin.GenerateUrl]({
-                                type: 'standard__recordPage',
-                                attributes: {
-                                    recordId: newItem.cartItem.productId,
-                                    objectApiName: 'Product2',
-                                    actionName: 'view'
-                                }
-                            })
-                        )
-                        .then((url) => {
-                            newItem.productUrl = url;
-                        });
-                    generatedUrls.push(urlGenerated);
-                    return newItem;
-                });
-            }
-            catch(e) {
-                console.log(e);
-            }
-        }
-        
+            generatedUrls.push(urlGenerated);
+            return newItem;
+        });
 
         // When we've generated all our navigation item URLs, update the list once more.
         Promise.all(generatedUrls).then(() => {
@@ -264,23 +213,6 @@ export default class Items extends NavigationMixin(LightningElement) {
      * This lifecycle hook fires when this component is inserted into the DOM.
      */
     connectedCallback() {
-
-
-        if (isGuest) {
-            try {
-                console.log('cartItems.connectedCallback: this.cartItems');
-                // let guestCartItems = JSON.stringify(this.cartItems);
-                // let parsedItems = JSON.parse(guestCartItems);
-                // this.cartItems = parsedItems;
-                // console.log(this.cartItems);
-
-            }
-            catch(e) {
-                console.log(e);
-            }
-
-        }
-
         // Once connected, resolve the associated Promise.
         this._connectedResolver();
     }
@@ -303,56 +235,29 @@ export default class Items extends NavigationMixin(LightningElement) {
      * @private
      */
     get displayItems() {
-        if (!isGuest) {
-            return this._items.map((item) => {
-                // Create a copy of the item that we can safely mutate.
-                const newItem = { ...item };
-    
-                // Set whether or not to display negotiated price
-                newItem.showNegotiatedPrice =
-                    this.showNegotiatedPrice &&
-                    (newItem.cartItem.totalPrice || '').length > 0;
-    
-                // Set whether or not to display original price
-                newItem.showOriginalPrice = displayOriginalPrice(
-                    this.showNegotiatedPrice,
-                    this.showOriginalPrice,
-                    newItem.cartItem.totalPrice,
-                    newItem.cartItem.totalListPrice
-                );
-                // get the label for original price to provide to the aria-label attr for screen readers
-                newItem.originalPriceLabel = getLabelForOriginalPrice(
-                    this.currencyCode,
-                    newItem.cartItem.totalListPrice
-                );
-                return newItem;
-            });
-        }
-        else if (isGuest) {
-            return this._items.map((item) => {
-                // Create a copy of the item that we can safely mutate.
-                const newItem = { ...item };
-    
-                // Set whether or not to display negotiated price
-                newItem.showNegotiatedPrice =
-                    this.showNegotiatedPrice &&
-                    (newItem.cartItem.totalPrice || '').length > 0;
-    
-                // Set whether or not to display original price
-                newItem.showOriginalPrice = displayOriginalPrice(
-                    this.showNegotiatedPrice,
-                    this.showOriginalPrice,
-                    newItem.cartItem.totalPrice,
-                    newItem.cartItem.totalListPrice
-                );
-                // get the label for original price to provide to the aria-label attr for screen readers
-                newItem.originalPriceLabel = getLabelForOriginalPrice(
-                    this.currencyCode,
-                    newItem.cartItem.totalListPrice
-                );
-                return newItem;
-            });
-        }
+        return this._items.map((item) => {
+            // Create a copy of the item that we can safely mutate.
+            const newItem = { ...item };
+
+            // Set whether or not to display negotiated price
+            newItem.showNegotiatedPrice =
+                this.showNegotiatedPrice &&
+                (newItem.cartItem.totalPrice || '').length > 0;
+
+            // Set whether or not to display original price
+            newItem.showOriginalPrice = displayOriginalPrice(
+                this.showNegotiatedPrice,
+                this.showOriginalPrice,
+                newItem.cartItem.totalPrice,
+                newItem.cartItem.totalListPrice
+            );
+            // get the label for original price to provide to the aria-label attr for screen readers
+            newItem.originalPriceLabel = getLabelForOriginalPrice(
+                this.currencyCode,
+                newItem.cartItem.totalListPrice
+            );
+            return newItem;
+        });
     }
 
     /**
