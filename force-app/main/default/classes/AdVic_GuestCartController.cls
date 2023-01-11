@@ -5,7 +5,9 @@ public without sharing class AdVic_GuestCartController {
     // Changes Made By daniel
     @AuraEnabled
     public static List<Guest_Cart_Item__c> getGuestCartItems(String guestCartId){
-        List<Guest_Cart_Item__c> listOfItem = [SELECT Quantity__c, Guest_Cart__c, Id FROM Guest_Cart_Item__c where Guest_Cart__c = :guestCartId ];
+        List<Guest_Cart_Item__c> listOfItem = [SELECT Id, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c  
+                                                FROM Guest_Cart_Item__c 
+                                                WHERE Guest_Cart__c = :guestCartId ];
         return listOfItem;
     }
 
@@ -59,10 +61,41 @@ public without sharing class AdVic_GuestCartController {
         //return guestCartItem.Quantity__c * productPrice;
         return productPrice;
     }
+
+    @AuraEnabled
+    public static Guest_Cart_Item__c updateGuestCartItemTotals(String guestCartItemId, Integer quantity) {
+        Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                            FROM Guest_Cart_Item__c 
+                                            WHERE Id = :guestCartItemId];
+
+        updatedItem.Quantity__c = decimal.valueof(quantity);
+
+        Decimal productPrice = guestCartItemPrice(updatedItem.Product__c);
+
+        updatedItem.TotalPrice__c = productPrice * updatedItem.Quantity__c;
+        updatedItem.TotalLineAmount__c = updatedItem.TotalPrice__c;
+        updatedItem.TotalAmount__c = updatedItem.TotalPrice__c;
+        updatedItem.TotalLineGrossAmount__c = updatedItem.TotalPrice__c;
+
+        try {
+            update updatedItem;
+        }
+        catch(DmlException e) {
+            System.debug('Error in AdVic_GuestCartController.adjustProductQuantity: ' + e.getMessage());
+            throw new AuraHandledException(e.getMessage());
+        }
+
+        // Adjust cart totals 
+        Decimal totalAmount = quantity * productPrice;
+        Decimal grandTotalAmount = totalAmount;
+        Decimal totalAmountAfterAllAdjustments = totalAmount;
+
+        // update the cart total fields
+        updateGuestCartTotals(updatedItem.Guest_Cart__c, totalAmount, grandTotalAmount, totalAmountAfterAllAdjustments);
+        return updatedItem;
+    }
     
 
-    // We need to update all price fields on the Guest Cart Item so we can use it in the above function when updating totals
-    // need to figure out how to calculate all these fields, and how to get necessary data from Price Book Entry
     @AuraEnabled
     public static Guest_Cart_Item__c adjustProductQuantity(String guestCartItemId, Integer quantity) {
         Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 

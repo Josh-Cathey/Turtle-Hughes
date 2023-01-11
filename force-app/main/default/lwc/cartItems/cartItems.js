@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import isGuest from '@salesforce/user/isGuest';
 
 import { resolve } from 'c/cmsResourceResolver';
 import { getLabelForOriginalPrice, displayOriginalPrice } from 'c/cartUtils';

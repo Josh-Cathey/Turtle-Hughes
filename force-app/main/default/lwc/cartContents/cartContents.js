@@ -8,6 +8,9 @@ import deleteCartItem from '@salesforce/apex/B2BCartController.deleteCartItem';
 import deleteCart from '@salesforce/apex/B2BCartController.deleteCart';
 import createCart from '@salesforce/apex/B2BCartController.createCart';
 import isGuest from '@salesforce/user/isGuest';
+import updateGuestCartItemTotals from '@salesforce/apex/AdVic_GuestCartController.updateGuestCartItemTotals';
+import retrieveUpdatedGuestCart from '@salesforce/apex/AdVic_GuestCartController.retrieveUpdatedGuestCart';
+import getGuestCartItems from '@salesforce/apex/AdVic_GuestCartController.getGuestCartItems';
 
 import { fireEvent } from 'c/pubsub';
 import { isCartClosed } from 'c/cartUtils';
@@ -17,7 +20,7 @@ const CART_CHANGED_EVT = 'cartchanged';
 const CART_ITEMS_UPDATED_EVT = 'cartitemsupdated';
 
 // Locked Cart Status
-const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout',  'Active']);
+const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout']);
 
 /**
  * A sample cart contents component.
@@ -33,6 +36,7 @@ export default class CartContents extends NavigationMixin(LightningElement) {
     @track cartConfig;
     @track guestCartItems;
     @track guestCart;
+    @track guestCartId;
 
     /**
      * An event fired when the cart changes.
@@ -299,29 +303,15 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * This lifecycle hook fires when this component is inserted into the DOM.
      */
     connectedCallback() {
-
         if (isGuest){
             this.getCartFromLocalStorage();
+
             // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
             this.updateCartItems();
-
-            // TESTING
-            console.log('cartContents: this.isCartClosed = ' + this.isCartClosed);
-            console.log('cartContents: this.cartItems');
-            console.log(this.cartItems);
-            console.log('cartContents: this.currencyCode = ' + this.currencyCode);
-            console.log('cartContents: this.isCartDisabled = ' + this.isCartDisabled);
         }
         else {
             // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
             this.updateCartItems();
-
-            // TESTING
-            console.log('cartContents: this.isCartClosed = ' + this.isCartClosed);
-            console.log('cartContents: this.cartItems');
-            console.log(this.cartItems);
-            console.log('cartContents: this.currencyCode = ' + this.currencyCode);
-            console.log('cartContents: this.isCartDisabled = ' + this.isCartDisabled);
         }
     }
 
@@ -360,6 +350,8 @@ export default class CartContents extends NavigationMixin(LightningElement) {
             // console.log('cartItems');
             // console.log(this.cartItems);
 
+            // We need to update this field for sorting guest items
+            // this.sortParam
             this._cartItemCount = Number(this.cartItems.length);
             this.isCartDisabled = false;
             this.isCartClosed = false;
@@ -376,6 +368,7 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @private
      */
     handleChangeSortSelection(event) {
+        console.log('cartContents.handleChangeSortSelection was called!!!');
         this.sortParam = event.target.value;
         // After the sort order has changed, we get a refreshed list
         this.updateCartItems();
@@ -396,6 +389,8 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @private
      */
     handleCartUpdate() {
+        console.log('cartContents.handleCartUpdate was called!!!');
+
         // Update Cart Badge
         this.dispatchEvent(
             new CustomEvent(CART_CHANGED_EVT, {
@@ -416,22 +411,56 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @private
      */
     handleQuantityChanged(evt) {
+        console.log('cartContents.handleQuantityChanged was called!!!');
+        // console.log('evt.detail.quantity');
+        // console.log(evt.detail.quantity);
         const { cartItemId, quantity } = evt.detail;
-        updateCartItem({
-            communityId,
-            effectiveAccountId: this.effectiveAccountId,
-            activeCartOrId: this.recordId,
-            cartItemId,
-            cartItem: { quantity }
-        })
-            .then((cartItem) => {
-                this.updateCartItemInformation(cartItem);
+        if(!isGuest) {
+            updateCartItem({
+                communityId,
+                effectiveAccountId: this.effectiveAccountId,
+                activeCartOrId: this.recordId,
+                cartItemId,
+                cartItem: { quantity }
             })
-            .catch((e) => {
-                // Handle quantity update error properly
-                // For this sample, we can just log the error
-                console.log(e);
-            });
+                .then((cartItem) => {
+                    this.updateCartItemInformation(cartItem);
+                })
+                .catch((e) => {
+                    // Handle quantity update error properly
+                    // For this sample, we can just log the error
+                    console.log(e);
+                });
+        }
+        if (isGuest) {
+
+            updateGuestCartItemTotals({
+                guestCartItemId: this.cartItems[0].cartItem.cartItemId, 
+                quantity: evt.detail.quantity
+            })
+                .then((data) => {
+                    console.log('Returning value from updateGuestCartItemTotals');
+                    console.log('data');
+                    console.log(data);
+
+                    getGuestCartItems({guestCartId: this.cartItems[0].cartItem.cartId
+                    })
+                        .then((guestCartItemList) => {
+                            // console.log('finished calling getGuestCartItems');
+                            // console.log('guestCartItems');
+                            // console.log(guestCartItems);
+
+                            this.updateCartItemInLocalStorage(guestCartItemList);
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                        });
+                })
+                .catch((e) => {
+                    console.log(e);
+                });
+
+        }
     }
 
     /**
@@ -443,6 +472,7 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @private
      */
     handleCartItemDelete(evt) {
+        console.log('cartContents.handleCartItemDelete was called!!!');
         const { cartItemId } = evt.detail;
         deleteCartItem({
             communityId,
@@ -468,35 +498,41 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @private
      */
     handleClearCartButtonClicked() {
-        // Step 1: Delete the current cart
-        deleteCart({
-            communityId,
-            effectiveAccountId: this.effectiveAccountId,
-            activeCartOrId: this.recordId
-        })
-            .then(() => {
-                // Step 2: If the delete operation was successful,
-                // set cartItems to undefined and update the cart header
-                this.cartItems = undefined;
-                this._cartItemCount = 0;
+        console.log('cartContents.handleClearCartButtonClicked was called!!!');
+        if (!isGuest) {
+            // Step 1: Delete the current cart
+            deleteCart({
+                communityId,
+                effectiveAccountId: this.effectiveAccountId,
+                activeCartOrId: this.recordId
             })
-            .then(() => {
-                // Step 3: Create a new cart
-                return createCart({
-                    communityId,
-                    effectiveAccountId: this.effectiveAccountId
+                .then(() => {
+                    // Step 2: If the delete operation was successful,
+                    // set cartItems to undefined and update the cart header
+                    this.cartItems = undefined;
+                    this._cartItemCount = 0;
+                })
+                .then(() => {
+                    // Step 3: Create a new cart
+                    return createCart({
+                        communityId,
+                        effectiveAccountId: this.effectiveAccountId
+                    });
+                })
+                .then((result) => {
+                    // Step 4: If create cart was successful, navigate to the new cart
+                    this.navigateToCart(result.cartId);
+                    this.handleCartUpdate();
+                })
+                .catch((e) => {
+                    // Handle quantity any errors properly
+                    // For this sample, we can just log the error
+                    console.log(e);
                 });
-            })
-            .then((result) => {
-                // Step 4: If create cart was successful, navigate to the new cart
-                this.navigateToCart(result.cartId);
-                this.handleCartUpdate();
-            })
-            .catch((e) => {
-                // Handle quantity any errors properly
-                // For this sample, we can just log the error
-                console.log(e);
-            });
+        }
+        if (isGuest) {
+            console.log('cartContents.handleClearCartButtonClicked() was called!!!');
+        }
     }
 
     /**
@@ -523,6 +559,7 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @param{string} cartItemId - The id of the cart we want to navigate to
      */
     removeCartItem(cartItemId) {
+        console.log('cartContents.removeCartItem was called!!!');
         const removedItem = (this.cartItems || []).filter(
             (item) => item.cartItem.cartItemId === cartItemId
         )[0];
@@ -547,6 +584,7 @@ export default class CartContents extends NavigationMixin(LightningElement) {
      * @param{CartItem} cartItem - An updated cart item
      */
     updateCartItemInformation(cartItem) {
+        console.log('cartContents.updateCartItemInformation was called!!!');
         // Get the item to update the product quantity correctly.
         let count = 0;
         const updatedCartItems = (this.cartItems || []).map((item) => {
@@ -637,5 +675,50 @@ export default class CartContents extends NavigationMixin(LightningElement) {
             cartItemsList.push(guestCartItem);
         }
         return cartItemsList;
+    }
+
+    updateCartItemInLocalStorage(guestCartItemList) {
+        for (var i = 0; i < this.guestCartItems.length; i++) {
+            if (guestCartItemList[0].Id === this.guestCartItems[i].Id) {
+                this.guestCartItems[i] = guestCartItemList[0];
+
+                console.log('inside updateCartItemInLocalStorage!!!');
+                console.log('this.guestCartItems');
+                console.log(this.guestCartItems);
+            }
+            // retrieveUpdatedGuestCart({cartId: guestCartId})
+            //     .then((data) => {
+            //         console.log('Finished calling retrieveUpdatedGuestCart!!!');
+
+            //         this.guestCart = data;
+            //         this.setCartToLocalStorage();
+            //         //this.getCartFromLocalStorage();
+            //         this.updateCartItems();
+            //     })
+            //     .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
+            // }
+        }
+
+        // retrieveUpdatedGuestCart({cartId: guestCartId})
+        //     .then((data) => {
+        //         console.log('Finished calling retrieveUpdatedGuestCart!!!');
+
+        //         this.guestCart = data;
+        //         this.setCartToLocalStorage();
+        //         this.getCartFromLocalStorage();
+        //         this.updateCartItems();
+        //     })
+        //     .catch(error => { console.error('Error calling AdVic_GuestCartController.retrieveUpdatedGuestCart() -> ' + error); })
+    }
+
+    setCartToLocalStorage() {
+        var cartDetail = {
+            cart: this.guestCart,
+            products: this.guestCartItems
+        };
+
+        this.cartConfig = cartDetail;
+
+        localStorage.setItem('cart', JSON.stringify(cartDetail));
     }
 }
