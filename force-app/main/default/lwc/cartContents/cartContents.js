@@ -17,7 +17,7 @@ const CART_CHANGED_EVT = 'cartchanged';
 const CART_ITEMS_UPDATED_EVT = 'cartitemsupdated';
 
 // Locked Cart Status
-const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout']);
+const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout',  'Active']);
 
 /**
  * A sample cart contents component.
@@ -31,8 +31,8 @@ const LOCKED_CART_STATUSES = new Set(['Processing', 'Checkout']);
 
 export default class CartContents extends NavigationMixin(LightningElement) {
     @track cartConfig;
-    @track products;
-    @track cart;
+    @track guestCartItems;
+    @track guestCart;
 
     /**
      * An event fired when the cart changes.
@@ -304,10 +304,24 @@ export default class CartContents extends NavigationMixin(LightningElement) {
             this.getCartFromLocalStorage();
             // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
             this.updateCartItems();
+
+            // TESTING
+            console.log('cartContents: this.isCartClosed = ' + this.isCartClosed);
+            console.log('cartContents: this.cartItems');
+            console.log(this.cartItems);
+            console.log('cartContents: this.currencyCode = ' + this.currencyCode);
+            console.log('cartContents: this.isCartDisabled = ' + this.isCartDisabled);
         }
         else {
             // Initialize 'cartItems' list as soon as the component is inserted in the DOM.
             this.updateCartItems();
+
+            // TESTING
+            console.log('cartContents: this.isCartClosed = ' + this.isCartClosed);
+            console.log('cartContents: this.cartItems');
+            console.log(this.cartItems);
+            console.log('cartContents: this.currencyCode = ' + this.currencyCode);
+            console.log('cartContents: this.isCartDisabled = ' + this.isCartDisabled);
         }
     }
 
@@ -341,10 +355,16 @@ export default class CartContents extends NavigationMixin(LightningElement) {
                 });
         }
         else if (isGuest) {
-            this.cartItems = this.cartConfig.products;
-            this._cartItemCount = Number(this.cartConfig.products.length);
+            this.cartItems = this.buildGuestCartItems();
+            // TESTING
+            // console.log('cartItems');
+            // console.log(this.cartItems);
+
+            this._cartItemCount = Number(this.cartItems.length);
             this.isCartDisabled = false;
             this.isCartClosed = false;
+
+            this.currencyCode = this.currencyCode != null ? this.currencyCode : 'USD';
         }
         
     }
@@ -546,29 +566,76 @@ export default class CartContents extends NavigationMixin(LightningElement) {
         this.handleCartUpdate();
     }
 
-    // Logic for guests
+    // Fetching a Guest Cart from local storage
     getCartFromLocalStorage() {
-        var products;
         var cart;
         try {
             cart = JSON.parse(localStorage.getItem('cart'));
             if (cart != null) {
                 this.cartConfig = JSON.stringify(cart);
-                // products = JSON.parse(this.cartConfig.products);
-                this.products = JSON.stringify(cart.products);
-                
-                //cart = JSON.stringify(this.cartConfig.cart);
-                this.cart = JSON.stringify(cart.cart);
+                this.guestCartItems = JSON.stringify(cart.products);
+                this.guestCart = JSON.stringify(cart.cart);
             }
-            console.log('this.cartConfig');
-            console.log(JSON.parse(this.cartConfig));
-            console.log('this.products');
-            console.log(JSON.parse(this.products));
-            console.log('this.cart');
-            console.log(JSON.parse(this.cart));
         }
         catch(e) {
             console.log(e);
         }
+    }
+
+    buildGuestCartItems() {
+        let cartItemsList = [];
+        let items = JSON.parse(this.guestCartItems);
+
+        for (var i = 0; i < items.length; i++) {
+            let guestCartItem = {
+                cartItem: {
+                    cartId: items[i].Guest_Cart__c,
+                    cartItemId: items[i].Id,
+                    itemizedAdjustmentAmount: 0,
+                    listPrice: items[i].SalesPrice__c,
+                    messagesSummary: {
+                        errorCount: 0,
+                        hasError: 0,
+                        limitedMessages: [],
+                        relatedEntityId: null,
+                        totalLineItemsWithErrors: null,
+                    },
+                    name: items[i].Name,
+                    productDetails: {
+                        fields: {},
+                        name: items[i].Name,
+                        productId: items[i].Product__c,
+                        purchaseQuantityRule: null,
+                        sku: '',
+                        thumbnailImage: {
+                            alternateText: '',
+                            contentVersionId: null,
+                            id: null,
+                            mediaType: 'Image',
+                            sortOrder: 0,
+                            thumbnailUrl: null,
+                            title: 'image',
+                            url: '/img/b2b/default-product-image.svg',
+                        },
+                    },
+                    productId: items[i].Product__c,
+                    quantity: items[i].Quantity__c,
+                    salesPrice: items[i].SalesPrice__c,
+                    totalAdjustmentAmount: items[i].UnitAdjustedPrice__c, // I think this is incorrect
+                    totalAmount: items[i].TotalAmount__c,
+                    totalListPrice: items[i].TotalPrice__c,
+                    totalPrice: items[i].TotalPrice__c,
+                    totalTax: '0.00', // This will need to be updated soon
+                    type: 'Product',
+                    unitAdjustedPrice: items[i].SalesPrice__c,
+                    unitAdjustmentAmount: '0.00',
+                },
+                message: null,
+                status: 'Success'
+            };
+
+            cartItemsList.push(guestCartItem);
+        }
+        return cartItemsList;
     }
 }

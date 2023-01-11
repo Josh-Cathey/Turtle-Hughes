@@ -65,7 +65,7 @@ public without sharing class AdVic_GuestCartController {
     // need to figure out how to calculate all these fields, and how to get necessary data from Price Book Entry
     @AuraEnabled
     public static Guest_Cart_Item__c adjustProductQuantity(String guestCartItemId, Integer quantity) {
-        Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+        Guest_Cart_Item__c updatedItem = [SELECT Id, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
                                             FROM Guest_Cart_Item__c 
                                             WHERE Id = :guestCartItemId];
 
@@ -86,7 +86,7 @@ public without sharing class AdVic_GuestCartController {
             throw new AuraHandledException(e.getMessage());
         }
 
-        // Adjust cart totals (sDecimal totalAmount, Decimal grandTotalAmount, decimal totalAmountAfterAllAdjustments) {
+        // Adjust cart totals 
         Decimal totalAmount = quantity * productPrice;
         Decimal grandTotalAmount = totalAmount;
         Decimal totalAmountAfterAllAdjustments = totalAmount;
@@ -108,13 +108,15 @@ public without sharing class AdVic_GuestCartController {
                             Quantity__c = quantity 
                         );
 
-        Decimal productPrice = guestCartItemPrice(productId);
+        Decimal unitPrice = guestCartItemPrice(productId);
 
-        newCartItem.TotalLineAmount__c = productPrice * quantity;
-        newCartItem.TotalAmount__c = productPrice * quantity;
-        newCartItem.TotalLineGrossAmount__c = productPrice * quantity;
-        newCartItem.TotalPrice__c = productPrice * quantity;
-        newCartItem.TotalAmount__c = productPrice * quantity;
+        newCartItem.TotalLineAmount__c = unitPrice * quantity;
+        newCartItem.TotalAmount__c = unitPrice * quantity;
+        newCartItem.TotalLineGrossAmount__c = unitPrice * quantity;
+        newCartItem.TotalPrice__c = unitPrice * quantity;
+        newCartItem.TotalAmount__c = unitPrice * quantity;
+        newCartItem.SalesPrice__c = unitPrice;
+        newCartItem.UnitAdjustedPrice__c = unitPrice;
 
         try {
             insert newCartItem;
