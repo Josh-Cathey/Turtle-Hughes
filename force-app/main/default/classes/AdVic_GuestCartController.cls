@@ -18,14 +18,29 @@ public without sharing class AdVic_GuestCartController {
                 WHERE Id = :cartId];
     }
 
-    private static void updateGuestCartTotals(String cartId, Decimal totalAmount, Decimal grandTotalAmount, decimal totalAmountAfterAllAdjustments) {
-        List<Guest_Cart__c> guestCart = [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
+    @AuraEnabled 
+    public static void updateGuestCartTotals(String cartId) {
+        Decimal totalAmount = 0;
+        Decimal grandTotalAmount = 0;
+        Decimal TotalAmountAfterAllAdjustments = 0;
+
+        Guest_Cart__c guestCart = [SELECT Id, Name, Status__c, Type__c, Cart_Subtotal__c, TaxType__c, TotalAmount__c, GrandTotalAmount__c, TotalAmountAfterAllAdjustments__c 
                                         FROM Guest_Cart__c 
                                         WHERE Id = :cartId];
 
-        guestCart[0].TotalAmount__c += totalAmount;
-        guestCart[0].GrandTotalAmount__c += grandTotalAmount;
-        guestCart[0].TotalAmountAfterAllAdjustments__c += totalAmountAfterAllAdjustments;
+        List<Guest_Cart_Item__c> guestCartItems = [SELECT Id, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                                    FROM Guest_Cart_Item__c 
+                                                    WHERE Guest_Cart__c = :cartId];
+
+        for (Guest_Cart_Item__c item : guestCartItems) {
+            totalAmount += item.Quantity__c * item.SalesPrice__c;
+        }
+        grandTotalAmount = totalAmount;
+        TotalAmountAfterAllAdjustments = totalAmount; // this might need updated at a later time
+
+        guestCart.TotalAmount__c = totalAmount;
+        guestCart.GrandTotalAmount__c = grandTotalAmount;
+        guestCart.TotalAmountAfterAllAdjustments__c = TotalAmountAfterAllAdjustments;
         
         try {
             update guestCart;
@@ -85,13 +100,8 @@ public without sharing class AdVic_GuestCartController {
             throw new AuraHandledException(e.getMessage());
         }
 
-        // Adjust cart totals 
-        Decimal totalAmount = quantity * productPrice;
-        Decimal grandTotalAmount = totalAmount;
-        Decimal totalAmountAfterAllAdjustments = totalAmount;
-
         // update the cart total fields
-        updateGuestCartTotals(updatedItem.Guest_Cart__c, totalAmount, grandTotalAmount, totalAmountAfterAllAdjustments);
+        updateGuestCartTotals(updatedItem.Guest_Cart__c);
         return updatedItem;
     }
     
@@ -119,13 +129,8 @@ public without sharing class AdVic_GuestCartController {
             throw new AuraHandledException(e.getMessage());
         }
 
-        // Adjust cart totals 
-        Decimal totalAmount = quantity * productPrice;
-        Decimal grandTotalAmount = totalAmount;
-        Decimal totalAmountAfterAllAdjustments = totalAmount;
-
         // update the cart total fields
-        updateGuestCartTotals(updatedItem.Guest_Cart__c, totalAmount, grandTotalAmount, totalAmountAfterAllAdjustments);
+        updateGuestCartTotals(updatedItem.Guest_Cart__c);
 
         return updatedItem;
     }
@@ -160,7 +165,7 @@ public without sharing class AdVic_GuestCartController {
         }
 
         // update the cart total fields
-        updateGuestCartTotals(newCartItem.Guest_Cart__c, newCartItem.TotalAmount__c, newCartItem.TotalAmount__c, newCartItem.TotalAmount__c);
+        updateGuestCartTotals(newCartItem.Guest_Cart__c);
 
         return newCartItem;
     }
@@ -186,5 +191,76 @@ public without sharing class AdVic_GuestCartController {
         }
 
         return newGuestCart;
+    }
+
+    @AuraEnabled
+    public static void deleteGuestCartItem(Id itemId) {
+        Guest_Cart_Item__c cartItem = [SELECT Id FROM Guest_Cart_Item__c WHERE Id = :itemId];
+        try {
+            delete cartItem;
+        }
+        catch(DmlException e) {
+            System.debug('Unable to deleting Guest Cart Item in AdVic_GuestCartController.deleteGuestCartItem()');
+            System.debug('Error message = ' + e.getMessage());
+        }
+    }
+
+    @AuraEnabled
+    public static void deleteGuestCart(Id guestCartId) {
+        Guest_Cart__c guestCart = [SELECT Id FROM Guest_Cart__c WHERE Id = :guestCartId];
+
+        // Delete the items from the cart first
+        deleteGuestCartItems(guestCartId);
+        try {
+            delete guestCart;
+        }
+        catch(DmlException e) {
+            System.debug('Unable to deleting Guest Cart Item in AdVic_GuestCartController.deleteGuestCartItem()');
+            System.debug('Error message = ' + e.getMessage());
+        }
+    }
+
+    private static void deleteGuestCartItems(Id guestCartId) {
+        List<Guest_Cart_Item__c> cartItems = [SELECT Id, Guest_Cart__c FROM Guest_Cart_Item__c WHERE Guest_Cart__c = :guestCartId];
+        try {
+            delete cartItems;
+        }
+        catch(DmlException e) {
+            System.debug('Unable to deleting Guest Cart Item in AdVic_GuestCartController.deleteGuestCartItem()');
+            System.debug('Error message = ' + e.getMessage());
+        }
+    }
+
+    @AuraEnabled 
+    public static List<Guest_Cart_Item__c> sortGuestCartItems(Id guestCartId, String sortOrder) {
+        List<Guest_Cart_Item__c> itemList = new List<Guest_Cart_Item__c>()
+
+;        // we will need a big conditional here to determine how we need to sort
+        if (sortOrder == 'CreatedDateDesc') {
+            itemList = [SELECT Id, CreatedDate, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                                FROM Guest_Cart_Item__c 
+                                                WHERE Guest_Cart__c = :guestCartId
+                                                ORDER BY CreatedDate DESC];
+        }
+        else if (sortOrder == 'CreatedDateAsc') {
+            itemList = [SELECT Id, CreatedDate, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                                FROM Guest_Cart_Item__c 
+                                                WHERE Guest_Cart__c = :guestCartId
+                                                ORDER BY CreatedDate ASC];
+        }
+        else if (sortOrder == 'NameAsc') {
+            itemList = [SELECT Id, CreatedDate, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                                FROM Guest_Cart_Item__c 
+                                                WHERE Guest_Cart__c = :guestCartId
+                                                ORDER BY Name ASC];
+        }
+        else if (sortOrder == 'NameDesc') {
+            itemList = [SELECT Id, CreatedDate, Guest_Cart__c, Name, Product__c, SalesPrice__c, UnitAdjustedPrice__c, Quantity__c, TotalAmount__c, TotalPrice__c 
+                                                FROM Guest_Cart_Item__c 
+                                                WHERE Guest_Cart__c = :guestCartId
+                                                ORDER BY Name DESC];
+        }
+
+        return itemList;
     }
 }
